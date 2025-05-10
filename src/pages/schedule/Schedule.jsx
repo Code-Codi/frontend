@@ -241,9 +241,9 @@ const Schedule = () => {
   const currentYear = currentDate.getFullYear();
   const weeks = createScheduleWeeks();
 
-  const handleDayClick = (day) => {
-    if (day !== null) setIsModalOpen(true);
-  };
+  // const handleDayClick = (day) => {
+  //   if (day !== null) setIsModalOpen(true);
+  // };
 
   return (
     <div>
@@ -275,7 +275,7 @@ const Schedule = () => {
                   <DayCell
                     key={dayIndex}
                     isDay={day !== null}
-                    onClick={() => handleDayClick(day)}
+                    //onClick={() => handleDayClick(day)}
                     ref={ref}
                   >
                     {day !== null && <DayLabel>{day}</DayLabel>}
