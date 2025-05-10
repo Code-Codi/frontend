@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { ReactComponent as HomeIcon } from '../../assets/home.svg';
@@ -12,7 +13,7 @@ import { ReactComponent as ShareIcon } from '../../assets/share.svg';
 const SidebarContainer = styled.div`
   width: 248px;
   height: 100vh;
-  padding-top: 90px; /* 헤더 높이만큼 아래로 */
+  padding-top: 90px;
   border-right: 2px solid #E6EFF5;
   background-color: white;
   position: fixed;
@@ -48,7 +49,7 @@ const SidebarIndicator = styled.div`
   width: 6px;
   height: 60px;
   position: absolute;
-  left: -70px; /* 왼쪽 라인 맞춤 */
+  left: -70px;
   top: ${({ index }) => index * 75}px;
   background: #1814F3;
   border-top-right-radius: 10px;
@@ -72,7 +73,7 @@ const items = [
   { label: '홈', icon: HomeIcon },
   { label: '가이드라인', icon: GuidelineIcon },
   { label: '프로젝트', icon: ProjectIcon },
-  { label: '캘린더', icon: CalendarIcon },
+  { label: '캘린더', icon: CalendarIcon, path: '/schedule' },
   { label: '회의록', icon: MeetingIcon },
   { label: '과제', icon: TaskIcon },
   { label: '공유', icon: ShareIcon },
@@ -80,6 +81,12 @@ const items = [
 
 const Sidebar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const navigate = useNavigate(); 
+
+  const handleItemClick = (index, path) => {
+    setActiveIndex(index);
+    navigate(path);
+  };
 
   return (
     <SidebarContainer>
@@ -90,7 +97,7 @@ const Sidebar = () => {
           const isActive = activeIndex === index;
 
           return (
-            <SidebarItemContainer key={index} onClick={() => setActiveIndex(index)}>
+            <SidebarItemContainer key={index} onClick={() => handleItemClick(index, item.path)}>
               <ColoredIconBox active={isActive}>
                 <Icon />
               </ColoredIconBox>
