@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { LocalDate, LocalDateTime } from "js-joda";
+import ScheduleListModal from "../../components/schedule/modal/ScheduleListModal";
 
 const ScheduleContainer = styled.div`
   display: flex;
@@ -108,8 +109,9 @@ const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THUR", "FRI", "SAT"];
 
 const Schedule = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  //const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [cellWidth, setCellWidth] = useState(100);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const firstCellRef = useRef(null);
 
@@ -241,104 +243,118 @@ const Schedule = () => {
   const currentYear = currentDate.getFullYear();
   const weeks = createScheduleWeeks();
 
-  // const handleDayClick = (day) => {
-  //   if (day !== null) setIsModalOpen(true);
-  // };
+  const handleDayClick = (day) => {
+    if (day !== null) {
+      const clickedDate = LocalDateTime.of(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        day,
+        0,
+        0,
+        0
+      );
+      setSelectedDate(clickedDate);
+      setIsModalOpen(true);
+    }
+  };
 
   return (
-    <div>
-      <ScheduleContainer>
-        <ScheduleHeader>
-          <ArrowButton onClick={navigateToPreviousMonth}>{"<"}</ArrowButton>
-          <MonthText>{`${currentYear}.${String(
-            currentDate.getMonth() + 1
-          ).padStart(2, "0")}`}</MonthText>
-          <ArrowButton onClick={navigateToNextMonth}>{">"}</ArrowButton>
-        </ScheduleHeader>
+    <ScheduleContainer>
+      <ScheduleHeader>
+        <ArrowButton onClick={navigateToPreviousMonth}>{"<"}</ArrowButton>
+        <MonthText>{`${currentYear}.${String(
+          currentDate.getMonth() + 1
+        ).padStart(2, "0")}`}</MonthText>
+        <ArrowButton onClick={navigateToNextMonth}>{">"}</ArrowButton>
+      </ScheduleHeader>
 
-        <WeekRow>
-          {daysOfWeek.map((day, index) => (
-            <DayCell key={index} isHeader>
-              <DayLabel>{day}</DayLabel>
-            </DayCell>
-          ))}
-        </WeekRow>
-
-        {weeks.map((week, weekIndex) => (
-          <div key={weekIndex}>
-            <WeekRow>
-              {week.map((day, dayIndex) => {
-                const isFirstCell = weekIndex === 0 && dayIndex === 0;
-                const ref = isFirstCell ? firstCellRef : null;
-
-                return (
-                  <DayCell
-                    key={dayIndex}
-                    isDay={day !== null}
-                    //onClick={() => handleDayClick(day)}
-                    ref={ref}
-                  >
-                    {day !== null && <DayLabel>{day}</DayLabel>}
-
-                    {day !== null &&
-                      (() => {
-                        const dateObj = new Date(
-                          currentDate.getFullYear(),
-                          currentDate.getMonth(),
-                          day
-                        );
-                        const { scheduleItems } =
-                          getScheduleItemsForDate(scheduleData);
-                        const filteredItems = scheduleItems.filter((item) =>
-                          isWithinRange(dateObj, item)
-                        );
-                        return (
-                          <>
-                            {filteredItems.slice(0, 3).map((item, idx) => {
-                              const showTitle = item.startDate.equals(
-                                LocalDate.of(
-                                  dateObj.getFullYear(),
-                                  dateObj.getMonth() + 1,
-                                  dateObj.getDate()
-                                )
-                              );
-
-                              const isEndOrSaturday =
-                                LocalDate.of(
-                                  dateObj.getFullYear(),
-                                  dateObj.getMonth() + 1,
-                                  dateObj.getDate()
-                                ).equals(item.endDate) ||
-                                dateObj.getDay() === 6;
-
-                              return (
-                                <ScheduleItem
-                                  key={idx}
-                                  width={`${
-                                    isEndOrSaturday ? cellWidth - 2 : cellWidth
-                                  }px`}
-                                  line={item.line}
-                                >
-                                  {showTitle && item.title}
-                                </ScheduleItem>
-                              );
-                            })}
-                            {filteredItems.length > 3 && (
-                              <OverflowLabel width={`${cellWidth}px`} line={3}>
-                                ...
-                              </OverflowLabel>
-                            )}
-                          </>
-                        );
-                      })()}
-                  </DayCell>
-                );
-              })}
-            </WeekRow>
-          </div>
+      <WeekRow>
+        {daysOfWeek.map((day, index) => (
+          <DayCell key={index} isHeader>
+            <DayLabel>{day}</DayLabel>
+          </DayCell>
         ))}
-      </ScheduleContainer>
-    </div>
+      </WeekRow>
+
+      {weeks.map((week, weekIndex) => (
+        <div key={weekIndex}>
+          <WeekRow>
+            {week.map((day, dayIndex) => {
+              const isFirstCell = weekIndex === 0 && dayIndex === 0;
+              const ref = isFirstCell ? firstCellRef : null;
+
+              return (
+                <DayCell
+                  key={dayIndex}
+                  isDay={day !== null}
+                  onClick={() => handleDayClick(day)}
+                  ref={ref}
+                >
+                  {day !== null && <DayLabel>{day}</DayLabel>}
+
+                  {day !== null &&
+                    (() => {
+                      const dateObj = new Date(
+                        currentDate.getFullYear(),
+                        currentDate.getMonth(),
+                        day
+                      );
+                      const { scheduleItems } =
+                        getScheduleItemsForDate(scheduleData);
+                      const filteredItems = scheduleItems.filter((item) =>
+                        isWithinRange(dateObj, item)
+                      );
+                      return (
+                        <>
+                          {filteredItems.slice(0, 3).map((item, idx) => {
+                            const showTitle = item.startDate.equals(
+                              LocalDate.of(
+                                dateObj.getFullYear(),
+                                dateObj.getMonth() + 1,
+                                dateObj.getDate()
+                              )
+                            );
+
+                            const isEndOrSaturday =
+                              LocalDate.of(
+                                dateObj.getFullYear(),
+                                dateObj.getMonth() + 1,
+                                dateObj.getDate()
+                              ).equals(item.endDate) || dateObj.getDay() === 6;
+
+                            return (
+                              <ScheduleItem
+                                key={idx}
+                                width={`${
+                                  isEndOrSaturday ? cellWidth - 2 : cellWidth
+                                }px`}
+                                line={item.line}
+                              >
+                                {showTitle && item.title}
+                              </ScheduleItem>
+                            );
+                          })}
+                          {filteredItems.length > 3 && (
+                            <OverflowLabel width={`${cellWidth}px`} line={3}>
+                              ...
+                            </OverflowLabel>
+                          )}
+                        </>
+                      );
+                    })()}
+                </DayCell>
+              );
+            })}
+          </WeekRow>
+        </div>
+      ))}
+      {isModalOpen && (
+        <ScheduleListModal
+          startDate={selectedDate}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+    </ScheduleContainer>
   );
 };
 
