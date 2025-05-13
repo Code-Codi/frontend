@@ -36,6 +36,7 @@ const MainTitle = styled.div`
 
 const ScheduleItem = styled.div`
   margin-bottom: 12px;
+  cursor: pointer;
 `;
 
 const ScheduleTitle = styled.div`
@@ -53,7 +54,7 @@ const DateText = styled.div`
 
 const AddButton = styled.div`
   position: absolute;
-  right: 25px;
+  right: 30px;
   bottom: 15px;
   color: #343c6a;
   font-size: 48px;
@@ -65,7 +66,13 @@ const formatDate = (date) => {
 };
 
 // 나중에 연동
-const ScheduleListModal = ({ startDate, onClose }) => {
+const ScheduleListModal = ({
+  startDate,
+  selectedSchedules,
+  onAdd,
+  onClose,
+  onScheduleClick,
+}) => {
   const sampleData = {
     title: formatDate(startDate),
     schedules: [
@@ -85,9 +92,9 @@ const ScheduleListModal = ({ startDate, onClose }) => {
   return (
     <Overlay onClick={(e) => e.target === e.currentTarget && onClose()}>
       <ModalContainer>
-        <MainTitle>{sampleData.title}</MainTitle>
-        {sampleData.schedules.map((schedule, index) => (
-          <ScheduleItem key={index}>
+        <MainTitle>{formatDate(startDate)}</MainTitle>
+        {selectedSchedules.map((schedule, index) => (
+          <ScheduleItem key={index} onClick={() => onScheduleClick(schedule)}>
             <ScheduleTitle>{schedule.title}</ScheduleTitle>
             <DateText>
               {formatDate(schedule.startDate)}
@@ -99,7 +106,7 @@ const ScheduleListModal = ({ startDate, onClose }) => {
             </DateText>
           </ScheduleItem>
         ))}
-        <AddButton>+</AddButton>
+        <AddButton onClick={onAdd}>+</AddButton>
       </ModalContainer>
     </Overlay>
   );
