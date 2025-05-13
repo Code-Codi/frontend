@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { LocalDate, LocalDateTime } from "js-joda";
 import ScheduleListModal from "../../components/schedule/modal/ScheduleListModal";
+import ScheduleCreateModal from "../../components/schedule/modal/ScheduleCreateModal";
+import ScheduleDeleteModal from "../../components/schedule/modal/ScheduleDeleteModal";
+import ScheduleDetailModal from "../../components/schedule/modal/ScheduleDetailModal";
 
 const ScheduleContainer = styled.div`
   display: flex;
@@ -109,9 +112,11 @@ const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THUR", "FRI", "SAT"];
 
 const Schedule = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [modalType, setModalType] = useState("list");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cellWidth, setCellWidth] = useState(100);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
 
   const firstCellRef = useRef(null);
 
@@ -133,21 +138,25 @@ const Schedule = () => {
       startDate: LocalDateTime.parse("2025-05-12T17:00:00"),
       endDate: LocalDateTime.parse("2025-05-13T18:00:00"),
       title: "겹치는 일정 4",
+      content: "메모",
     },
     {
       startDate: LocalDateTime.parse("2025-05-13T18:00:00"),
       endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
       title: "겹치는 일정 3",
+      content: "메모",
     },
     {
       startDate: LocalDateTime.parse("2025-05-15T18:00:00"),
       endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
       title: "겹치는 일정 5",
+      content: "메모",
     },
     {
       startDate: LocalDateTime.parse("2025-05-15T18:00:00"),
       endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
       title: "겹치는 일정 5",
+      content: "메모",
     },
     {
       startDate: LocalDateTime.parse("2025-05-15T18:00:00"),
@@ -254,8 +263,40 @@ const Schedule = () => {
         0
       );
       setSelectedDate(clickedDate);
+
+      const selectedSchedules = scheduleData.filter((schedule) => {
+        const startDate = schedule.startDate.toLocalDate();
+        const endDate = schedule.endDate.toLocalDate();
+        const clickedLocalDate = clickedDate.toLocalDate();
+        return (
+          clickedLocalDate.isEqual(startDate) ||
+          clickedLocalDate.isEqual(endDate) ||
+          (clickedLocalDate.isAfter(startDate) &&
+            clickedLocalDate.isBefore(endDate))
+        );
+      });
+
+      setSelectedSchedule(selectedSchedules);
       setIsModalOpen(true);
     }
+  };
+
+  const handleAddClick = () => {
+    setModalType("create");
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalType("list");
+  };
+
+  const handleDeleteClick = () => {
+    setModalType("delete");
+  };
+
+  const handleScheduleClick = (schedule) => {
+    setSelectedSchedule(schedule);
+    setModalType("detail");
   };
 
   return (
@@ -349,10 +390,34 @@ const Schedule = () => {
         </div>
       ))}
       {isModalOpen && (
-        <ScheduleListModal
-          startDate={selectedDate}
-          onClose={() => setIsModalOpen(false)}
-        />
+        <>
+          {modalType === "list" && (
+            <ScheduleListModal
+              startDate={selectedDate}
+              selectedSchedules={selectedSchedule}
+              onClose={handleCloseModal}
+              onAdd={handleAddClick}
+              onScheduleClick={handleScheduleClick}
+            />
+          )}
+          {modalType === "create" && (
+            <ScheduleCreateModal onClose={handleCloseModal} />
+          )}
+          {modalType === "delete" && (
+            <ScheduleDeleteModal
+              onClose={handleCloseModal}
+              onDelete={handleCloseModal}
+            />
+          )}
+          {modalType === "detail" && (
+            <ScheduleDetailModal
+              schedule={selectedSchedule}
+              onClose={handleCloseModal}
+              onDelete={handleDeleteClick}
+              onEdit={handleAddClick}
+            />
+          )}
+        </>
       )}
     </ScheduleContainer>
   );
