@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const Table = styled.table`
   width: 100%;
@@ -24,11 +25,23 @@ const Td = styled.td`
   border-bottom: 1px solid #e5e5e5;
 `;
 
+const TableRow = styled.tr`
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
 const PlusButton = styled.div`
   text-align: center;
   font-size: 26px;
   margin-top: 25px;
   cursor: pointer;
+
+  &:hover {
+    color: #1814f3;
+  }
 `;
 
 const dummyData = [
@@ -40,10 +53,15 @@ const dummyData = [
     { no: "06.", date: "2025.8.30", title: "DB 모델링 리뷰", members: "ALL", place: "비대면" },
     { no: "07.", date: "2025.9.30", title: "기획 변경사항 공유", members: "ALL", place: "비대면" },
     { no: "08.", date: "2025.10.30", title: "2차 테스트 및 QA 피드백", members: "ALL", place: "비대면" },
-    // ...
 ];
 
 export default function MeetingTable() {
+    const navigate = useNavigate();
+
+    const goToDetail = () => {
+        navigate("/meetingDetail");
+    };
+
     return (
         <>
             <Table>
@@ -58,17 +76,17 @@ export default function MeetingTable() {
                 </thead>
                 <tbody>
                 {dummyData.map((item, idx) => (
-                    <tr key={idx}>
+                    <TableRow key={idx} onClick={goToDetail}>
                         <Td>{item.no}</Td>
                         <Td>{item.date}</Td>
                         <Td>{item.title}</Td>
                         <Td>{item.members}</Td>
                         <Td>{item.place}</Td>
-                    </tr>
+                    </TableRow>
                 ))}
                 </tbody>
             </Table>
-            <PlusButton onClick={() => alert("회의록 추가")}>＋</PlusButton>
+            <PlusButton onClick={goToDetail}>＋</PlusButton>
         </>
     );
 }
