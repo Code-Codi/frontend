@@ -1,104 +1,112 @@
 .taskboard-container {
-    padding: 32px;
-    margin-left: 248px;
-    margin-top: 90px;
-    background-color: #f5f7fa;
-    min-height: 100vh;
-  }
-  
-  .project-name {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 24px;
-    color: #343c6a;
-  }
-  
-  .task-columns {
-    display: flex;
-    gap: 20px;
-    justify-content: space-between;
-  }
-  
-  .task-column {
-    flex: 1;
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    height: fit-content;
-  }
-  
-  .column-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    font-size: 16px;
-    margin-bottom: 16px;
-    color: #343c6a;
-  }
-  
-  .task-count {
-    background-color: #f0f0f0;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-weight: 500;
-  }
-  
-  .task-card-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .task-card {
-    background-color: #f4f4f4;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .task-title {
-    font-weight: bold;
-    font-size: 15px;
-    margin-bottom: 4px;
-  }
-  
-  .task-code {
-    color: #e26363;
-    font-size: 13px;
-  }
-  
-  .task-period {
-    color: #6c63ff;
-    font-size: 13px;
-    margin: 2px 0;
-  }
-  
-  .task-owner {
-    font-size: 13px;
-    color: #666;
-  }
-  
-  .add-task-btn {
-    margin-top: auto;
-    width: 40px;
-    height: 40px;
-    background-color: #1814f3;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 24px;
-    cursor: pointer;
-    align-self: flex-end;
-    margin-right: 8px;
-    transition: background-color 0.2s;
-  }
-  
-  .add-task-btn:hover {
-    background-color: #3d37f1;
-  }
-  
+  padding: 32px;
+  margin-left: 248px;
+  margin-top: 90px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+.project-name {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  color: #343c6a;
+}
+
+.task-columns {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.task-column {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #343c6a;
+}
+
+.task-count {
+  background-color: #f0f0f0;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.task-card-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.task-card {
+  background-color: #f4f4f4;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  font-size: 14px;
+  color: #333;
+}
+
+.task-title {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.task-code {
+  color: #e26363;
+  font-size: 13px;
+}
+
+.task-period {
+  color: #6c63ff;
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.task-owner {
+  font-size: 13px;
+  color: #666;
+}
+
+.no-task-placeholder {
+  text-align: center;
+  color: #aaa;
+  font-size: 13px;
+  margin: 16px 0;
+}
+
+.add-task-btn {
+  margin-top: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: #1814f3;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 24px;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-right: 8px;
+  transition: background-color 0.2s;
+}
+
+.add-task-btn:hover {
+  background-color: #3d37f1;
+}

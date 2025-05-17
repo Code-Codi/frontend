@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Schedule from "./pages/schedule/Schedule";
-import Project from "./pages/project/ProjectHome"
-import SubProject from "./pages/project/Project"
+//import Project from "./pages/project/ProjectHome"
+import Project from "./pages/project/Project"
 import Sidebar from "./components/sidebar/Sidebar";
 import Header from "./components/Header/Header";
 import { createGlobalStyle } from 'styled-components';
@@ -23,7 +23,7 @@ function App() {
       <Routes>
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/project" element={<Project />} />
-        <Route path="/project/subProject" element={<SubProject />} />
+        <Route path="/project/subProject" element={<Project />} />
       </Routes>
     </BrowserRouter>
   );
