@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Schedule from "./pages/schedule/Schedule";
+import MeetingList from "./pages/meeting/MeetingList";
 import Sidebar from "./components/sidebar/Sidebar";
-import Header from "./components/header/Header";
+import Header from "./components/Header/Header";
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -20,6 +21,7 @@ function App() {
       <Sidebar />
       <Routes>
         <Route path="/schedule" element={<Schedule />} />
+        <Route path="/meeting" element={<MeetingList />} />
       </Routes>
     </BrowserRouter>
   );
