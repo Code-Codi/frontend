@@ -3,6 +3,7 @@ import Schedule from "./pages/schedule/Schedule";
 import MeetingList from "./pages/meeting/MeetingList";
 import MeetingDetail from "./pages/meeting/MeetingDetailForm";
 import TaskList from "./pages/task/TaskList";
+import TaskDetail from "./pages/task/TaskDetailForm";
 import Sidebar from "./components/sidebar/Sidebar";
 import Header from "./components/Header/Header";
 import { createGlobalStyle } from 'styled-components';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/meetingList" element={<MeetingList />} />
         <Route path="/meetingDetail" element={<MeetingDetail />} />
         <Route path="/taskList" element={<TaskList />} />
+        <Route path="/taskDetail" element={<TaskDetail/>} />
       </Routes>
     </BrowserRouter>
   );

@@ -89,7 +89,7 @@ export default function TaskTable() {
                 </thead>
                 <tbody>
                 {dummyTasks.map((task, idx) => (
-                    <TableRow key={idx}>
+                    <TableRow key={idx} onClick={goToDetail}>
                         <Td>{task.no}</Td>
                         <Td>{task.date}</Td>
                         <Td>{task.title}</Td>
