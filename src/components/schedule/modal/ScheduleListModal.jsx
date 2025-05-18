@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { LocalDateTime } from "js-joda";
+import { LocalDateTime, DateTimeFormatter } from "js-joda";
 
 const Overlay = styled.div`
   position: fixed;
@@ -61,8 +61,8 @@ const AddButton = styled.div`
   cursor: pointer;
 `;
 
-const formatDate = (date) => {
-  return `${date.monthValue()}월 ${date.dayOfMonth()}일`;
+const formatDate = (localDateTime) => {
+  return `${localDateTime.monthValue()}월 ${localDateTime.dayOfMonth()}일`;
 };
 
 // 나중에 연동
@@ -73,22 +73,6 @@ const ScheduleListModal = ({
   onClose,
   onScheduleClick,
 }) => {
-  const sampleData = {
-    title: formatDate(startDate),
-    schedules: [
-      {
-        title: "일정 1의 제목",
-        startDate: LocalDateTime.parse("2025-05-11T09:00:00"),
-        endDate: LocalDateTime.parse("2025-05-11T17:00:00"),
-      },
-      {
-        title: "일정 2의 제목",
-        startDate: LocalDateTime.parse("2025-05-10T12:00:00"),
-        endDate: LocalDateTime.parse("2025-05-17T15:00:00"),
-      },
-    ],
-  };
-
   return (
     <Overlay onClick={(e) => e.target === e.currentTarget && onClose()}>
       <ModalContainer>
@@ -97,12 +81,12 @@ const ScheduleListModal = ({
           <ScheduleItem key={index} onClick={() => onScheduleClick(schedule)}>
             <ScheduleTitle>{schedule.title}</ScheduleTitle>
             <DateText>
-              {formatDate(schedule.startDate)}
-              {schedule.startDate
-                .toLocalDate()
-                .equals(schedule.endDate.toLocalDate())
+              {formatDate(LocalDateTime.parse(schedule.startDate))}
+              {LocalDateTime.parse(schedule.startDate).equals(
+                LocalDateTime.parse(schedule.endDate)
+              )
                 ? ""
-                : ` ~ ${formatDate(schedule.endDate)}`}
+                : ` ~ ${formatDate(LocalDateTime.parse(schedule.endDate))}`}
             </DateText>
           </ScheduleItem>
         ))}
