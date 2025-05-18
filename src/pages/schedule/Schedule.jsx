@@ -5,6 +5,7 @@ import ScheduleListModal from "../../components/schedule/modal/ScheduleListModal
 import ScheduleCreateModal from "../../components/schedule/modal/ScheduleCreateModal";
 import ScheduleDeleteModal from "../../components/schedule/modal/ScheduleDeleteModal";
 import ScheduleDetailModal from "../../components/schedule/modal/ScheduleDetailModal";
+import { getSchedule } from "../../api/schedule/scheduleAPI";
 
 const ScheduleContainer = styled.div`
   display: flex;
@@ -88,24 +89,9 @@ const ScheduleItem = styled.div`
   align-items: center;
   padding-left: 2px;
   position: absolute;
-  top: ${({ line }) => line * 25 + 30}px;
+  top: ${({ line }) => line * 25 + 35}px;
   left: 0;
   box-sizing: border-box;
-`;
-
-const OverflowLabel = styled.div`
-  font-size: 15px;
-  position: absolute;
-  top: ${({ line }) => line * 25 + 25}px;
-  padding-left: 5px;
-  box-sizing: border-box;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  justify-content: center;
 `;
 
 const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THUR", "FRI", "SAT"];
@@ -117,66 +103,45 @@ const Schedule = () => {
   const [cellWidth, setCellWidth] = useState(100);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [scheduleData, setScheduleData] = useState([]);
 
   const firstCellRef = useRef(null);
 
+  const currentYear = currentDate.getFullYear();
+
+  const updateCellWidth = () => {
+    if (firstCellRef.current) {
+      setCellWidth(firstCellRef.current.offsetWidth);
+    }
+  };
+
   useEffect(() => {
-    const updateCellWidth = () => {
-      if (firstCellRef.current) {
-        setCellWidth(firstCellRef.current.offsetWidth);
+    const fetchScheduleData = async () => {
+      try {
+        const data = await getSchedule(currentYear, currentDate.getMonth() + 1);
+
+        setScheduleData(data.result); // 데이터만 세팅
+        console.log(data.result);
+      } catch (error) {
+        console.error("스케줄 로딩 실패:", error);
       }
     };
+
+    fetchScheduleData(); // 데이터 불러오기
 
     updateCellWidth();
     window.addEventListener("resize", updateCellWidth);
     return () => window.removeEventListener("resize", updateCellWidth);
-  }, []);
-
-  // 임시 데이터
-  const scheduleData = [
-    {
-      startDate: LocalDateTime.parse("2025-05-12T17:00:00"),
-      endDate: LocalDateTime.parse("2025-05-13T18:00:00"),
-      title: "겹치는 일정 4",
-      content: "메모",
-    },
-    {
-      startDate: LocalDateTime.parse("2025-05-13T18:00:00"),
-      endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
-      title: "겹치는 일정 3",
-      content: "메모",
-    },
-    {
-      startDate: LocalDateTime.parse("2025-05-15T18:00:00"),
-      endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
-      title: "겹치는 일정 5",
-      content: "메모",
-    },
-    {
-      startDate: LocalDateTime.parse("2025-05-15T18:00:00"),
-      endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
-      title: "겹치는 일정 5",
-      content: "메모",
-    },
-    {
-      startDate: LocalDateTime.parse("2025-05-15T18:00:00"),
-      endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
-      title: "겹치는 일정 5",
-    },
-    {
-      startDate: LocalDateTime.parse("2025-05-15T18:00:00"),
-      endDate: LocalDateTime.parse("2025-05-21T19:00:00"),
-      title: "겹치는 일정 5",
-    },
-  ];
+  }, [currentDate]);
 
   const navigateToPreviousMonth = () =>
     setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
+      (prevDate) => new Date(prevDate.getFullYear(), prevDate.getMonth() - 1)
     );
+
   const navigateToNextMonth = () =>
     setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
+      (prevDate) => new Date(prevDate.getFullYear(), prevDate.getMonth() + 1)
     );
 
   const getFirstDayOfMonth = (date) =>
@@ -199,30 +164,41 @@ const Schedule = () => {
     return weeks;
   };
 
+  const weeks = createScheduleWeeks();
+  const globalLineMapRef = useRef(new Map());
+
   const getScheduleItemsForDate = (schedules) => {
     const placedSchedules = [];
     const scheduleItems = [];
+    const lineMap = globalLineMapRef.current;
 
     schedules.forEach((schedule) => {
-      const startDate = schedule.startDate.toLocalDate();
-      const endDate = schedule.endDate.toLocalDate();
+      const startDate = LocalDateTime.parse(schedule.startDate).toLocalDate();
+      const endDate = LocalDateTime.parse(schedule.endDate).toLocalDate();
+      const scheduleId = `${schedule.title}-${startDate}-${endDate}`;
 
-      const usedLines = new Set();
+      let line;
+      if (lineMap.has(scheduleId)) {
+        line = lineMap.get(scheduleId);
+      } else {
+        // 줄 번호 새로 계산
+        const usedLines = new Set();
+        placedSchedules.forEach((placed) => {
+          if (
+            !(
+              endDate.isBefore(placed.startDate) ||
+              startDate.isAfter(placed.endDate)
+            )
+          ) {
+            usedLines.add(placed.line);
+          }
+        });
 
-      placedSchedules.forEach((placed) => {
-        if (
-          !(
-            endDate.isBefore(placed.startDate) ||
-            startDate.isAfter(placed.endDate)
-          )
-        ) {
-          usedLines.add(placed.line);
+        line = 0;
+        while (usedLines.has(line)) {
+          line++;
         }
-      });
-
-      let line = 0;
-      while (usedLines.has(line)) {
-        line++;
+        lineMap.set(scheduleId, line);
       }
 
       placedSchedules.push({ line, startDate, endDate });
@@ -249,9 +225,6 @@ const Schedule = () => {
     return dateObj >= start && dateObj <= end;
   };
 
-  const currentYear = currentDate.getFullYear();
-  const weeks = createScheduleWeeks();
-
   const handleDayClick = (day) => {
     if (day !== null) {
       const clickedDate = LocalDateTime.of(
@@ -268,6 +241,7 @@ const Schedule = () => {
         const startDate = schedule.startDate.toLocalDate();
         const endDate = schedule.endDate.toLocalDate();
         const clickedLocalDate = clickedDate.toLocalDate();
+
         return (
           clickedLocalDate.isEqual(startDate) ||
           clickedLocalDate.isEqual(endDate) ||
@@ -347,39 +321,37 @@ const Schedule = () => {
                       );
                       return (
                         <>
-                          {filteredItems.slice(0, 3).map((item, idx) => {
-                            const showTitle = item.startDate.equals(
-                              LocalDate.of(
-                                dateObj.getFullYear(),
-                                dateObj.getMonth() + 1,
-                                dateObj.getDate()
-                              )
-                            );
+                          {filteredItems
+                            .filter((item) => item.line < 4)
+                            .map((item, idx) => {
+                              const showTitle = item.startDate.equals(
+                                LocalDate.of(
+                                  dateObj.getFullYear(),
+                                  dateObj.getMonth() + 1,
+                                  dateObj.getDate()
+                                )
+                              );
 
-                            const isEndOrSaturday =
-                              LocalDate.of(
-                                dateObj.getFullYear(),
-                                dateObj.getMonth() + 1,
-                                dateObj.getDate()
-                              ).equals(item.endDate) || dateObj.getDay() === 6;
+                              const isEndOrSaturday =
+                                LocalDate.of(
+                                  dateObj.getFullYear(),
+                                  dateObj.getMonth() + 1,
+                                  dateObj.getDate()
+                                ).equals(item.endDate) ||
+                                dateObj.getDay() === 6;
 
-                            return (
-                              <ScheduleItem
-                                key={idx}
-                                width={`${
-                                  isEndOrSaturday ? cellWidth - 2 : cellWidth
-                                }px`}
-                                line={item.line}
-                              >
-                                {showTitle && item.title}
-                              </ScheduleItem>
-                            );
-                          })}
-                          {filteredItems.length > 3 && (
-                            <OverflowLabel width={`${cellWidth}px`} line={3}>
-                              ...
-                            </OverflowLabel>
-                          )}
+                              return (
+                                <ScheduleItem
+                                  key={idx}
+                                  width={`${
+                                    isEndOrSaturday ? cellWidth - 2 : cellWidth
+                                  }px`}
+                                  line={item.line}
+                                >
+                                  {showTitle && item.title}
+                                </ScheduleItem>
+                              );
+                            })}
                         </>
                       );
                     })()}
@@ -401,7 +373,10 @@ const Schedule = () => {
             />
           )}
           {modalType === "create" && (
-            <ScheduleCreateModal onClose={handleCloseModal} />
+            <ScheduleCreateModal
+              selectedDate={selectedDate}
+              onClose={handleCloseModal}
+            />
           )}
           {modalType === "delete" && (
             <ScheduleDeleteModal
