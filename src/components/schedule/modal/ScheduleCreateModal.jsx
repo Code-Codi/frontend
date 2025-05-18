@@ -142,6 +142,7 @@ const ScheduleCreateModal = ({
   onClose,
   mode = "create",
   schedule,
+  onSaveSuccess,
 }) => {
   const [teamId, setTeamId] = useState(1); // 임시 설정ㅇ
   const [title, setTitle] = useState("");
@@ -229,6 +230,16 @@ const ScheduleCreateModal = ({
       return;
     }
 
+    if (title.length > 20) {
+      alert("제목은 20자 이내로 입력해주세요.");
+      return;
+    }
+
+    if (content.length > 50) {
+      alert("내용은 50자 이내로 입력해주세요.");
+      return;
+    }
+
     const scheduleData = {
       teamId: teamId, // 임시 설정
       title: title,
@@ -243,6 +254,7 @@ const ScheduleCreateModal = ({
       } else if (mode === "edit") {
         await updateSchedule(schedule.id, scheduleData);
       }
+      onSaveSuccess();
       onClose();
     } catch (error) {
       console.error("스케줄 등록 실패:", error);

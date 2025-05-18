@@ -275,6 +275,21 @@ const Schedule = () => {
     setModalType("delete");
   };
 
+  const updateScheduleData = async () => {
+    try {
+      const data = await getSchedule(currentYear, currentDate.getMonth() + 1);
+      setScheduleData(data.result);
+    } catch (error) {}
+  };
+
+  const handleDeleteSuccess = () => {
+    updateScheduleData();
+  };
+
+  const handleSaveSuccess = () => {
+    updateScheduleData();
+  };
+
   const handleScheduleClick = (schedule) => {
     setSelectedSchedule(schedule);
     setModalType("detail");
@@ -384,6 +399,7 @@ const Schedule = () => {
               selectedDate={selectedDate}
               onClose={handleCloseModal}
               mode="create"
+              onSaveSuccess={handleSaveSuccess}
             />
           )}
           {modalType === "edit" && (
@@ -392,12 +408,14 @@ const Schedule = () => {
               onClose={handleCloseModal}
               mode="edit"
               schedule={selectedSchedule}
+              onSaveSuccess={handleSaveSuccess}
             />
           )}
           {modalType === "delete" && (
             <ScheduleDeleteModal
+              scheduleId={selectedSchedule.id}
               onClose={handleCloseModal}
-              onDelete={handleCloseModal}
+              onDeleteSuccess={handleDeleteSuccess}
             />
           )}
           {modalType === "detail" && (

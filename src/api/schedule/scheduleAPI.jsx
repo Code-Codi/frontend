@@ -28,3 +28,12 @@ export const updateSchedule = async (id, scheduleData) => {
     throw error;
   }
 };
+
+export const deleteSchedule = async (id) => {
+  try {
+    const response = await axios.delete(`/api/schedules/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
