@@ -65,7 +65,6 @@ const formatDate = (localDateTime) => {
   return `${localDateTime.monthValue()}월 ${localDateTime.dayOfMonth()}일`;
 };
 
-// 나중에 연동
 const ScheduleListModal = ({
   startDate,
   selectedSchedules,

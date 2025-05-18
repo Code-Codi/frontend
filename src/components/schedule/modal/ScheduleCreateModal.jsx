@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { saveSchedule } from "../../../api/schedule/scheduleAPI";
+import {
+  createSchedule,
+  updateSchedule,
+} from "../../../api/schedule/scheduleAPI";
 
 const Overlay = styled.div`
   position: fixed;
@@ -134,7 +137,12 @@ const SubmitButton = styled.button`
   }
 `;
 
-const ScheduleCreateModal = ({ selectedDate, onClose }) => {
+const ScheduleCreateModal = ({
+  selectedDate,
+  onClose,
+  mode = "create",
+  schedule,
+}) => {
   const [teamId, setTeamId] = useState(1); // 임시 설정ㅇ
   const [title, setTitle] = useState("");
 
@@ -158,15 +166,29 @@ const ScheduleCreateModal = ({ selectedDate, onClose }) => {
   };
 
   useEffect(() => {
-    const formattedDate = formatLocalDateTimeToDateString(selectedDate);
-    setStartDate(formattedDate);
-    setEndDate(formattedDate);
-    // startLocalDateTime, endLocalDateTime 초기 세팅
-    if (formattedDate) {
-      setStartLocalDateTime(`${formattedDate}T${startTime}:00`);
-      setEndLocalDateTime(`${formattedDate}T${endTime}:00`);
+    if (mode === "edit" && schedule) {
+      setTitle(schedule.title || "");
+
+      const start = new Date(schedule.startDate);
+      const end = new Date(schedule.endDate);
+      setStartDate(start.toISOString().slice(0, 10));
+      setStartTime(start.toISOString().slice(11, 16));
+      setStartLocalDateTime(schedule.startDate);
+      setEndDate(end.toISOString().slice(0, 10));
+      setEndTime(end.toISOString().slice(11, 16));
+      setEndLocalDateTime(schedule.endDate);
+      setContent(schedule.content || "");
+      setTeamId(schedule.teamId || 1);
+    } else if (mode === "create" && selectedDate) {
+      const formattedDate = formatLocalDateTimeToDateString(selectedDate);
+      setStartDate(formattedDate);
+      setEndDate(formattedDate);
+      if (formattedDate) {
+        setStartLocalDateTime(`${formattedDate}T${startTime}:00`);
+        setEndLocalDateTime(`${formattedDate}T${endTime}:00`);
+      }
     }
-  }, [selectedDate]);
+  }, [mode, schedule, selectedDate]);
 
   const combineDateTime = (date, time) => {
     return date && time ? `${date}T${time}:00` : "";
@@ -175,7 +197,6 @@ const ScheduleCreateModal = ({ selectedDate, onClose }) => {
   const handleDateTimeChange = (date, time, setDateTime, label) => {
     const combined = combineDateTime(date, time);
     setDateTime(combined);
-    console.log(`${label} LocalDateTime:`, combined);
   };
 
   const onStartDateChange = (e) => {
@@ -217,11 +238,14 @@ const ScheduleCreateModal = ({ selectedDate, onClose }) => {
     };
 
     try {
-      await saveSchedule(scheduleData);
+      if (mode === "create") {
+        await createSchedule(scheduleData);
+      } else if (mode === "edit") {
+        await updateSchedule(schedule.id, scheduleData);
+      }
       onClose();
     } catch (error) {
       console.error("스케줄 등록 실패:", error);
-      alert("스케줄 등록 중 오류가 발생했습니다.");
     }
   };
 

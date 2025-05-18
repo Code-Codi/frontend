@@ -111,7 +111,10 @@ const Schedule = () => {
 
   const updateCellWidth = () => {
     if (firstCellRef.current) {
-      setCellWidth(firstCellRef.current.offsetWidth);
+      const newWidth = firstCellRef.current.offsetWidth;
+      setCellWidth((prevWidth) =>
+        prevWidth !== newWidth ? newWidth : prevWidth
+      );
     }
   };
 
@@ -121,7 +124,6 @@ const Schedule = () => {
         const data = await getSchedule(currentYear, currentDate.getMonth() + 1);
 
         setScheduleData(data.result); // 데이터만 세팅
-        console.log(data.result);
       } catch (error) {
         console.error("스케줄 로딩 실패:", error);
       }
@@ -238,15 +240,14 @@ const Schedule = () => {
       setSelectedDate(clickedDate);
 
       const selectedSchedules = scheduleData.filter((schedule) => {
-        const startDate = schedule.startDate.toLocalDate();
-        const endDate = schedule.endDate.toLocalDate();
-        const clickedLocalDate = clickedDate.toLocalDate();
+        const startDate = LocalDateTime.parse(schedule.startDate).toLocalDate();
+        const endDate = LocalDateTime.parse(schedule.endDate).toLocalDate();
 
         return (
-          clickedLocalDate.isEqual(startDate) ||
-          clickedLocalDate.isEqual(endDate) ||
-          (clickedLocalDate.isAfter(startDate) &&
-            clickedLocalDate.isBefore(endDate))
+          clickedDate.toLocalDate().equals(startDate) ||
+          clickedDate.toLocalDate().equals(endDate) ||
+          (clickedDate.toLocalDate().isAfter(startDate) &&
+            clickedDate.toLocalDate().isBefore(endDate))
         );
       });
 
@@ -256,7 +257,13 @@ const Schedule = () => {
   };
 
   const handleAddClick = () => {
+    setSelectedSchedule(null);
     setModalType("create");
+  };
+
+  const handleEditClick = (schedule) => {
+    setSelectedSchedule(schedule);
+    setModalType("edit");
   };
 
   const handleCloseModal = () => {
@@ -376,6 +383,15 @@ const Schedule = () => {
             <ScheduleCreateModal
               selectedDate={selectedDate}
               onClose={handleCloseModal}
+              mode="create"
+            />
+          )}
+          {modalType === "edit" && (
+            <ScheduleCreateModal
+              selectedDate={selectedDate}
+              onClose={handleCloseModal}
+              mode="edit"
+              schedule={selectedSchedule}
             />
           )}
           {modalType === "delete" && (
@@ -389,7 +405,7 @@ const Schedule = () => {
               schedule={selectedSchedule}
               onClose={handleCloseModal}
               onDelete={handleDeleteClick}
-              onEdit={handleAddClick}
+              onEdit={() => handleEditClick(selectedSchedule)}
             />
           )}
         </>
