@@ -61,6 +61,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   font-size: 14px;
   color: #333;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
 }
 
 .task-title {
@@ -109,4 +110,57 @@
 
 .add-task-btn:hover {
   background-color: #3d37f1;
+}
+
+.task-card.highlight {
+  border: 1px solid #3d37f1;
+  transition: border 0.3s ease;
+}
+
+.taskboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.sort-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #343c6a;
+}
+
+.sort-select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+  font-size: 14px;
+  color: #333;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.sort-select:hover {
+  border-color: #888;
+}
+
+.sort-toggle-btn {
+  background-color: #ffffff;
+  color: #343c6a;
+  font-size: 14px;
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.sort-toggle-btn:hover {
+  background-color: #f1f1f1;
+  border-color: #888;
 }

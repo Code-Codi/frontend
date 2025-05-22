@@ -8,26 +8,25 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
     name: "",
     description: "",
     priority: "중",
-    repeat: false,
     manager: "",
     startDate: "",
     targetDeadline: "",
     endDate: "",
-    progressPercent: 0,
-    status: status === "할일" ? "todo" : status === "진행중" ? "inprogress" : "completed",
+    status: status === "할일" ? "TODO" : status === "진행중" ? "INPROGRESS" : "COMPLETED",
   });
 
+  const [isEditMode, setIsEditMode] = useState(!initialData);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (initialData) {
       const convertedStatus =
         initialData.status === "할일"
-          ? "todo"
+          ? "TODO"
           : initialData.status === "진행중"
-          ? "inprogress"
+          ? "INPROGRESS"
           : initialData.status === "완료"
-          ? "completed"
+          ? "COMPLETED"
           : initialData.status;
 
       setFormData({
@@ -58,11 +57,13 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
 
     try {
       if (formData.id) {
-        await axios.put(`http://localhost:8080/project/${formData.id}`, payload);
+        await axios.patch(`http://localhost:8080/project/${formData.id}`, payload);
+        refreshData(formData.id); 
       } else {
-        await axios.post("http://localhost:8080/project", payload);
+        const res = await axios.post("http://localhost:8080/project", payload);
+        const createdId = res.data.result.id; 
+        refreshData(createdId);
       }
-      refreshData();
       onClose();
     } catch (err) {
       console.error("저장 실패", err);
@@ -80,66 +81,158 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
   };
 
   return (
-    <div className="task-modal-overlay">
+    <div
+      className="task-modal-overlay"
+      onClick={(e) => {
+        if (e.target.classList.contains("task-modal-overlay")) {
+          onClose();
+        }
+      }}
+    >
       <div className="task-modal">
-        <h3>{formData.id ? "프로젝트 수정" : "새 프로젝트 등록"} <span className="modal-status">({status})</span></h3>
+        {!initialData && (
+          <div className="modal-top-header">
+            <h2>프로젝트 생성</h2>
+          </div>
+        )}
+        {initialData && isEditMode && (
+          <div className="modal-top-header">
+            <h2>프로젝트 수정</h2>
+          </div>
+        )}
+
+        {!isEditMode && (
+          <div className="modal-header">
+            <h3>{formData.name || "새 프로젝트"}</h3>
+            <button className="edit-toggle-btn" onClick={() => setIsEditMode(true)}>
+              ✏️ 수정
+            </button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
-          <label>프로젝트명
-            <input name="name" value={formData.name} onChange={handleChange} required />
-          </label>
+          {isEditMode && (
+            <label>프로젝트명
+              <input name="name" value={formData.name} onChange={handleChange} required />
+            </label>
+          )}
 
           <label>설명
-            <textarea name="description" value={formData.description} onChange={handleChange} />
+            {isEditMode ? (
+              <textarea name="description" value={formData.description} onChange={handleChange} />
+            ) : (
+              <div className="readonly-value">{formData.description || "-"}</div>
+            )}
           </label>
 
           <label>우선순위
-            <select name="priority" value={formData.priority} onChange={handleChange}>
-              <option value="상">상</option>
-              <option value="중">중</option>
-              <option value="하">하</option>
-            </select>
-          </label>
-
-          <label className="checkbox-row">
-            <input type="checkbox" name="repeat" checked={formData.repeat} onChange={handleChange} />
-            반복 여부
+            {isEditMode ? (
+              <select name="priority" value={formData.priority} onChange={handleChange}>
+                <option value="상">상</option>
+                <option value="중">중</option>
+                <option value="하">하</option>
+              </select>
+            ) : (
+              <div className="readonly-value">{formData.priority}</div>
+            )}
           </label>
 
           <label>담당자
-            <input name="manager" value={formData.manager} onChange={handleChange} />
+            {isEditMode ? (
+              <input name="manager" value={formData.manager} onChange={handleChange} />
+            ) : (
+              <div className="readonly-value">{formData.manager || "미정"}</div>
+            )}
           </label>
 
           <label>상태
-            <select name="status" value={formData.status} onChange={handleChange}>
-              <option value="todo">할일</option>
-              <option value="inprogress">진행중</option>
-              <option value="completed">완료</option>
-            </select>
+            {isEditMode ? (
+              <select name="status" value={formData.status} onChange={handleChange}>
+                <option value="TODO">할일</option>
+                <option value="INPROGRESS">진행중</option>
+                <option value="COMPLETED">완료</option>
+              </select>
+            ) : (
+              <div className="readonly-value">
+                {{
+                  TODO: "할일",
+                  INPROGRESS: "진행중",
+                  COMPLETED: "완료",
+                }[formData.status] || formData.status}
+              </div>
+            )}
           </label>
 
-          {(formData.status === "inprogress" || formData.status === "completed") && (
+          {(formData.status === "INPROGRESS" || formData.status === "COMPLETED") && (
             <label>시작일
-              <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} />
+              {isEditMode ? (
+                <input type="date" name="startDate" value={formData.startDate} onChange={handleChange} />
+              ) : (
+                <div className="readonly-value">{formData.startDate}</div>
+              )}
             </label>
           )}
 
-          {formData.status === "inprogress" && (
+          {formData.status === "INPROGRESS" && (
             <label>목표 마감일
-              <input type="date" name="targetDeadline" value={formData.targetDeadline} onChange={handleChange} />
+              {isEditMode ? (
+                <input type="date" name="targetDeadline" value={formData.targetDeadline} onChange={handleChange} />
+              ) : (
+                <div className="readonly-value">{formData.targetDeadline}</div>
+              )}
             </label>
           )}
 
-          {formData.status === "completed" && (
+          {formData.status === "COMPLETED" && (
             <label>마감일
-              <input type="date" name="endDate" value={formData.endDate} onChange={handleChange} />
+              {isEditMode ? (
+                <input type="date" name="endDate" value={formData.endDate} onChange={handleChange} />
+              ) : (
+                <div className="readonly-value">{formData.endDate}</div>
+              )}
             </label>
           )}
 
           <div className="task-modal-actions">
-            <button type="submit">저장</button>
-            <button type="button" onClick={onClose}>취소</button>
-            {formData.id && (
-              <button type="button" className="delete-btn" onClick={() => setShowDeleteConfirm(true)}>🗑 삭제</button>
+            {isEditMode ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (initialData) {
+                      setFormData({ ...initialData });
+                      setIsEditMode(false);
+                    } else {
+                      onClose();
+                    }
+                  }}
+                >
+                  취소
+                </button>
+                <button type="submit">저장</button>
+                {formData.id && (
+                  <button
+                    type="button"
+                    className="delete-btn"
+                    onClick={() => setShowDeleteConfirm(true)}
+                  >
+                    🗑 삭제
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={onClose}>닫기</button>
+                {formData.id && (
+                  <button
+                    type="button"
+                    className="delete-btn"
+                    onClick={() => setShowDeleteConfirm(true)}
+                  >
+                    🗑 삭제
+                  </button>
+                )}
+              </>
             )}
           </div>
         </form>
