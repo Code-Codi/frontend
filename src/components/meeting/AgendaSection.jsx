@@ -23,9 +23,9 @@ const AddButton = styled.button`
   margin-top: 20px;
 `;
 
-export default function AgendaSection({ agendas, setAgendas }) {
+export default function AgendaSection({ agendas, setAgendas, editing }) {
     const addAgenda = () => {
-        setAgendas([...agendas, { title: '', details: [''] }]);
+        setAgendas([...agendas, { title: '', details: [{ content: '' }] }]);
     };
 
     return (
@@ -38,9 +38,10 @@ export default function AgendaSection({ agendas, setAgendas }) {
                     agenda={agenda}
                     agendas={agendas}
                     setAgendas={setAgendas}
+                    editing={editing}
                 />
             ))}
-            <AddButton onClick={addAgenda}>＋ 안건 추가</AddButton>
+            {editing && <AddButton onClick={addAgenda}>＋ 안건 추가</AddButton>}
         </Section>
     );
 }

@@ -62,6 +62,10 @@ export default function MeetingTable() {
         navigate("/meetingDetail");
     };
 
+    const handleCreateMeeting = () => {
+        navigate("/meetingCreate");
+    };
+
     return (
         <>
             <Table>
@@ -86,7 +90,7 @@ export default function MeetingTable() {
                 ))}
                 </tbody>
             </Table>
-            <PlusButton onClick={goToDetail}>＋</PlusButton>
+            <PlusButton onClick={handleCreateMeeting}>＋</PlusButton>
         </>
     );
 }

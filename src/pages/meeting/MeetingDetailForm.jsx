@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import { useParams, useLocation, useNavigate} from 'react-router-dom';
+import axios from 'axios';
 import AgendaSection from '../../components/meeting/AgendaSection';
 import DecisionSection from '../../components/meeting/DecisionSection';
 
@@ -110,10 +112,17 @@ const ActionButton = styled.button`
 `;
 
 export default function MeetingDetailForm() {
+    const { meetingId } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const isCreateMode = location.pathname === '/meetingCreate';
+    const [editing, setEditing] = useState(isCreateMode);
+
     const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
     const [participants, setParticipants] = useState([]);
-    const [location, setLocation] = useState('');
+    const [locationName, setLocationName] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -121,6 +130,151 @@ export default function MeetingDetailForm() {
     const [decisions, setDecisions] = useState(['']);
 
     const participantOptions = ['ALL', '세미', '수현', '민경', '세령'];
+    const handleCreate = async () => {
+        try {
+            const formattedDateTime = `${date}T00:00:00`;
+
+            const res = await axios.post('http://localhost:8080/meeting', {
+                teamId: 1,
+                title,
+                dateTime: formattedDateTime,
+                location: locationName
+            });
+
+            const meetingId = res.data.result;
+
+            for (const agenda of agendas) {
+                const agendaRes = await axios.post('http://localhost:8080/meeting/item/agenda', {
+                    meetingId,
+                    title: agenda.title
+                });
+
+                const agendaId = agendaRes.data.result;
+
+                for (const detail of agenda.details) {
+                    await axios.post('http://localhost:8080/meeting/item/agenda-detail', {
+                        agendaId,
+                        content: detail
+                    });
+                }
+            }
+
+            for (const content of decisions) {
+                await axios.post('http://localhost:8080/meeting/item/decision', {
+                    meetingId,
+                    content
+                });
+            }
+
+            alert('회의록이 성공적으로 등록되었습니다!');
+            navigate(`/meetingDetail/${meetingId}`);
+        } catch (error) {
+            console.error('등록 중 오류:', error);
+            alert('회의록 등록에 실패했습니다.');
+        }
+    };
+
+    const handleUpdate = async () => {
+        try {
+            // 1. Meeting 자체 수정
+            const formattedDateTime = `${date}T00:00:00`;
+            await axios.patch(`http://localhost:8080/meeting/${meetingId}`, {
+                title,
+                dateTime: formattedDateTime,
+                location: locationName,
+            });
+
+            // 2. Agenda + AgendaDetail 수정/등록
+            for (const agenda of agendas) {
+                let agendaId = agenda.id;
+
+                // 기존 agenda 수정
+                if (agendaId) {
+                    await axios.patch(`http://localhost:8080/meeting/item/agenda/${agendaId}`, {
+                        title: agenda.title
+                    });
+                } else {
+                    // 새 agenda 등록
+                    const agendaRes = await axios.post("http://localhost:8080/meeting/item/agenda", {
+                        meetingId,
+                        title: agenda.title
+                    });
+                    agendaId = agendaRes.data.result;
+                }
+
+                // AgendaDetail 수정/등록
+                for (const detail of agenda.details) {
+                    if (detail.id) {
+                        await axios.patch(`http://localhost:8080/meeting/item/agenda-detail/${detail.id}`, {
+                            content: detail.content
+                        });
+                    } else {
+                        await axios.post("http://localhost:8080/meeting/item/agenda-detail", {
+                            agendaId,
+                            content: detail.content
+                        });
+                    }
+                }
+            }
+
+            // 3. Decision 수정/등록
+            for (const decision of decisions) {
+                if (decision.id) {
+                    await axios.patch(`http://localhost:8080/meeting/item/decision/${decision.id}`, {
+                        content: decision.content
+                    });
+                } else {
+                    await axios.post(`http://localhost:8080/meeting/item/decision`, {
+                        meetingId,
+                        content: decision.content
+                    });
+                }
+            }
+
+            alert("회의록이 성공적으로 수정되었습니다!");
+            setEditing(false);
+        } catch (error) {
+            console.error("수정 중 오류:", error);
+            alert("회의록 수정에 실패했습니다.");
+        }
+    };
+
+
+    useEffect(() => {
+        const fetchMeeting = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8080/meeting/${meetingId}`);
+                const data = res.data.result;
+
+                setTitle(data.title);
+                setDate(data.dateTime.split('T')[0]);
+                setLocationName(data.location);
+
+                //  객체 -> 문자열로 변환
+                const processedAgendas = data.agendas.map((agenda) => ({
+                    id: agenda.id,
+                    title: agenda.title,
+                    details: agenda.details.map((detail) => ({
+                        id: detail.id,
+                        content: detail.content
+                    }))
+                }));
+                setAgendas(processedAgendas);
+
+                const processedDecisions = data.decisions.map((d) => ({
+                    id: d.id,
+                    content: d.content
+                }));
+                setDecisions(processedDecisions);
+
+            } catch (err) {
+                console.error('회의 조회 실패:', err);
+            }
+        };
+
+        if (meetingId) fetchMeeting();
+    }, [meetingId]);
+
 
     const handleToggleSelect = (value) => {
         if (value === 'ALL') {
@@ -157,10 +311,10 @@ export default function MeetingDetailForm() {
             <Content>
                 <Section>
                     <SectionTitle>회의 개요</SectionTitle>
-                    <Input placeholder="회의 제목을 입력하세요." value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Input placeholder="회의 제목을 입력하세요." value={title} onChange={(e) => setTitle(e.target.value)} disabled={!editing}/>
                     <Row>
                         <div>
-                            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} disabled={!editing} />
                         </div>
                         <div style={{ position: 'relative' }} ref={dropdownRef}>
                             <DisplayBox onClick={() => setShowDropdown(!showDropdown)}>{renderParticipantDisplay()}</DisplayBox>
@@ -179,17 +333,22 @@ export default function MeetingDetailForm() {
                             )}
                         </div>
                         <div>
-                            <Input placeholder="장소" value={location} onChange={(e) => setLocation(e.target.value)} />
+                            <Input placeholder="장소" value={locationName} onChange={(e) => setLocationName(e.target.value)} disabled={!editing}/>
                         </div>
                     </Row>
                 </Section>
 
-                <AgendaSection agendas={agendas} setAgendas={setAgendas} />
-                <DecisionSection decisions={decisions} setDecisions={setDecisions} />
+                <AgendaSection agendas={agendas} setAgendas={setAgendas}  editing={editing} />
+                <DecisionSection decisions={decisions} setDecisions={setDecisions}  editing={editing} />
 
                 <ButtonGroup>
-                    <ActionButton>수정</ActionButton>
-                    <ActionButton>저장</ActionButton>
+                    {isCreateMode ? (
+                        <ActionButton onClick={handleCreate}>등록</ActionButton>
+                    ) : !editing ? (
+                        <ActionButton onClick={() => setEditing(true)}>수정</ActionButton>
+                    ) : (
+                        <ActionButton onClick={handleUpdate}>저장</ActionButton>
+                    )}
                 </ButtonGroup>
             </Content>
         </Container>

@@ -35,7 +35,7 @@ const AddDetailButton = styled.button`
     margin-top: 12px;
 `;
 
-export default function AgendaItem({ index, agenda, agendas, setAgendas }) {
+export default function AgendaItem({ index, agenda, agendas, setAgendas, editing }) {
     const handleTitleChange = (value) => {
         const updated = [...agendas];
         updated[index].title = value;
@@ -44,13 +44,13 @@ export default function AgendaItem({ index, agenda, agendas, setAgendas }) {
 
     const handleDetailChange = (detailIndex, value) => {
         const updated = [...agendas];
-        updated[index].details[detailIndex] = value;
+        updated[index].details[detailIndex].content = value;
         setAgendas(updated);
     };
 
     const addDetail = () => {
         const updated = [...agendas];
-        updated[index].details.push('');
+        updated[index].details.push({ content: '' });
         setAgendas(updated);
     };
 
@@ -61,17 +61,19 @@ export default function AgendaItem({ index, agenda, agendas, setAgendas }) {
                 placeholder="안건 제목을 입력하세요"
                 value={agenda.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
+                disabled={!editing}
             />
             <Label>상세 항목</Label>
             {agenda.details.map((detail, dIdx) => (
                 <Input
-                    key={dIdx}
+                    key={detail.id || dIdx}
                     placeholder={`상세 항목 ${dIdx + 1}`}
-                    value={detail}
+                    value={detail.content}
                     onChange={(e) => handleDetailChange(dIdx, e.target.value)}
+                    disabled={!editing}
                 />
             ))}
-            <AddDetailButton onClick={addDetail}>＋ 안건 상세 추가</AddDetailButton>
+            {editing && <AddDetailButton onClick={addDetail}>＋ 안건 상세 추가</AddDetailButton>}
         </Card>
     );
 }

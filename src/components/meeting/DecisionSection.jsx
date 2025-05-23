@@ -51,15 +51,18 @@ const AddButton = styled.button`
   margin-top: 10px;
 `;
 
-export default function DecisionSection({ decisions, setDecisions }) {
+export default function DecisionSection({ decisions, setDecisions, editing }) {
     const handleChange = (index, value) => {
         const updated = [...decisions];
-        updated[index] = value;
+        updated[index] = {
+            ...(typeof updated[index] === 'string' ? { id: undefined } : updated[index]),
+            content: value,
+        };
         setDecisions(updated);
     };
 
     const addDecision = () => {
-        setDecisions([...decisions, '']);
+        setDecisions([...decisions, { content: '' }]);
     };
 
     return (
@@ -70,12 +73,13 @@ export default function DecisionSection({ decisions, setDecisions }) {
                     <Badge>{index + 1}</Badge>
                     <Input
                         placeholder="결정 사항 내용을 입력하세요."
-                        value={item}
+                        value={item.content || ''}
                         onChange={(e) => handleChange(index, e.target.value)}
+                        disabled={!editing}
                     />
                 </Row>
             ))}
-            <AddButton onClick={addDecision}>＋ 결정 사항 추가</AddButton>
+            {editing && <AddButton onClick={addDecision}>＋ 결정 사항 추가</AddButton>}
         </Section>
     );
 }
