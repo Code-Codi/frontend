@@ -4,16 +4,16 @@ import axios from 'axios';
 import {useParams, useLocation, useNavigate} from 'react-router-dom';
 
 const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  background: #f5f7fa;
-  min-height: 100vh;
-  padding: 100px 20px 50px 20px;
+    display: flex;
+    background: #f5f7fa;
+    min-height: 100vh;
 `;
 
 const Content = styled.div`
-  width: 100%;
-  max-width: 960px;
+    margin-left: 248px;
+    padding: 100px 80px 0 80px;
+    width: 100%;
+    box-sizing: border-box;
 `;
 
 const Section = styled.div`
