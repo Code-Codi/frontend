@@ -27,7 +27,6 @@ export default function TaskList() {
             <Sidebar />
             <Content>
                 <Header />
-                <Title>과제 리스트</Title>
                 <TaskTable />
             </Content>
         </Container>
