@@ -29,7 +29,8 @@ function App() {
         <Route path="/meetingList" element={<MeetingList />} />
         <Route path="/meetingDetail" element={<MeetingDetail />} />
         <Route path="/taskList" element={<TaskList />} />
-        <Route path="/taskDetail" element={<TaskDetail/>} />
+        <Route path="/taskDetail/:taskId" element={<TaskDetail/>} />
+        <Route path="/taskCreate" element={<TaskDetail />} />
         <Route path="/project" element={<Project />} />
         <Route path="/project/subProject" element={<Project />} />
       </Routes>

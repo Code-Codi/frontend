@@ -1,4 +1,6 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Table = styled.table`
@@ -53,31 +55,76 @@ const PlusButton = styled.div`
   }
 `;
 
-const dummyTasks = [
-    { no: "01.", date: "2025.03.30", title: "1주 과제", submitted: true },
-    { no: "02.", date: "2025.03.30", title: "2주 과제", submitted: false },
-    { no: "03.", date: "2025.03.30", title: "2주 과제", submitted: false },
-    { no: "04.", date: "2025.03.30", title: "2주 과제", submitted: false },
-];
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+`;
+
+const PageButton = styled.button`
+  background: ${({ active }) => (active ? "#1814f3" : "#fff")};
+  color: ${({ active }) => (active ? "#fff" : "#000")};
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  margin: 0 4px;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+    background: #1814f3;
+    color: white;
+  }
+`;
+
+const HeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
 
 export default function TaskTable() {
     const navigate = useNavigate();
+    const [tasks, setTasks] = useState([]);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
-    const handleSubmit = (task) => {
-        if (!task.submitted) {
-            const confirm = window.confirm("과제를 제출하시겠습니까?");
-            if (confirm) {
-                alert("제출되었습니다 (실제 제출 로직 필요)");
-            }
+    const fetchTasks = async (pageNum = 0) => {
+        try {
+            const res = await axios.get(`http://localhost:8080/tasks?page=${pageNum}&size=10`);
+            setTasks(res.data.content);
+            setPage(res.data.number);
+            setTotalPages(res.data.totalPages);
+        } catch (error) {
+            console.error("과제 리스트 조회 실패:", error);
         }
     };
 
-    const goToDetail = () => {
-        navigate("/taskDetail");
+    useEffect(() => {
+        fetchTasks(0);
+    }, []);
+
+    const handleSubmit = (task) => {
+        if (window.confirm("과제를 제출하시겠습니까?")) {
+            alert("제출되었습니다 (로직 구현 필요)");
+        }
+    };
+
+    const goToDetail = (taskId) => {
+        navigate(`/taskDetail/${taskId}`);
+    };
+
+    const handleCreateTask = () => {
+        navigate("/taskCreate");
     };
 
     return (
         <>
+            <HeaderRow>
+                <h2 style={{ fontSize: "20px", color: "#343C6A", fontWeight: "bold" }}>과제 리스트</h2>
+                <PlusButton onClick={handleCreateTask}>＋</PlusButton>
+            </HeaderRow>
+
             <Table>
                 <thead>
                 <tr>
@@ -88,24 +135,28 @@ export default function TaskTable() {
                 </tr>
                 </thead>
                 <tbody>
-                {dummyTasks.map((task, idx) => (
-                    <TableRow key={idx} onClick={goToDetail}>
-                        <Td>{task.no}</Td>
-                        <Td>{task.date}</Td>
+                {tasks.map((task, idx) => (
+                    <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
+                        <Td>{page * 10 + idx + 1}</Td>
+                        <Td>{task.taskDate}</Td>
                         <Td>{task.title}</Td>
                         <Td>
-                            <SubmitButton
-                                submitted={task.submitted}
-                                onClick={() => handleSubmit(task)}
-                            >
-                                {task.submitted ? "제출완료" : "제출전"}
+                            <SubmitButton submitted={task.status === "COMPLETE"}>
+                                {task.status === "COMPLETE" ? "제출완료" : "제출전"}
                             </SubmitButton>
                         </Td>
                     </TableRow>
                 ))}
                 </tbody>
             </Table>
-            <PlusButton onClick={goToDetail}>＋</PlusButton>
+
+            <Pagination>
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <PageButton key={i} active={i === page} onClick={() => fetchTasks(i)}>
+                        {i + 1}
+                    </PageButton>
+                ))}
+            </Pagination>
         </>
     );
 }
