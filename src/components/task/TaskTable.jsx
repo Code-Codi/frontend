@@ -76,6 +76,10 @@ export default function TaskTable() {
         navigate("/taskDetail");
     };
 
+    const handleCreateTask = () => {
+        navigate("/taskCreate");
+    };
+
     return (
         <>
             <Table>
@@ -105,7 +109,7 @@ export default function TaskTable() {
                 ))}
                 </tbody>
             </Table>
-            <PlusButton onClick={goToDetail}>＋</PlusButton>
+            <PlusButton onClick={handleCreateTask}>＋</PlusButton>
         </>
     );
 }

@@ -140,10 +140,11 @@ export default function TaskDetailForm() {
     const [tasks, setTasks] = useState([{ title: '', detail: '' }]);
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
-
+    const [editing, setEditing] = useState(false);
     const participantOptions = ['ALL', '세미', '수현', '민경', '세령'];
 
     useEffect(() => {
+        if (taskId) {
         const fetchTask = async () => {
             try {
                 const response = await axios.get(`http://localhost:8080/tasks/${taskId}`);
@@ -152,6 +153,7 @@ export default function TaskDetailForm() {
                 setTitle(data.title);
                 setTasks(
                     data.details.map((detail) => ({
+                        id: detail.id,
                         title: detail.title,
                         detail: detail.content
                     }))
@@ -160,11 +162,68 @@ export default function TaskDetailForm() {
                 console.error('과제 정보를 불러오는 데 실패했습니다:', error);
             }
         };
-
-        if (taskId) {
             fetchTask();
         }
     }, [taskId]);
+
+    const handleCreate = async () => {
+        try {
+            // 1. Task 생성
+            const taskResponse = await axios.post("http://localhost:8080/tasks", {
+                teamId: 1,
+                title: title,
+                status: "IN_PROGRESS",
+                taskDate: new Date().toISOString().slice(0, 10), // yyyy-MM-dd 형식
+            });
+
+            const taskId = taskResponse.data;
+
+            // 2. 각 TaskDetail 등록
+            for (const task of tasks) {
+                await axios.post("http://localhost:8080/task-details", {
+                    taskId: taskId,
+                    title: task.title,
+                    content: task.detail,
+                });
+            }
+
+            alert("과제가 성공적으로 등록되었습니다!");
+        } catch (error) {
+            console.error("등록 중 오류:", error);
+            alert("과제 등록에 실패했습니다.");
+        }
+    };
+
+    const handleUpdate = async () => {
+        try {
+            // 1. Task 자체 수정
+            await axios.patch(`http://localhost:8080/tasks/${taskId}`, {
+                title: title,
+                status: "IN_PROGRESS",
+                taskDate: new Date().toISOString().slice(0, 10),
+            });
+
+            // 2. TaskDetail 각각 수정
+            for (const task of tasks) {
+                if (!task.id) {
+                    console.warn("TaskDetail ID가 없습니다. 생략됨:", task);
+                    continue;
+                }
+
+                await axios.patch(`http://localhost:8080/task-details/${task.id}`, {
+                    title: task.title,
+                    content: task.detail,
+                });
+            }
+
+            alert("과제가 성공적으로 수정되었습니다!");
+            setEditing(false);
+        } catch (error) {
+            console.error("수정 중 오류:", error);
+            alert("과제 수정에 실패했습니다.");
+        }
+    };
+
 
     const handleToggleSelect = (value) => {
         if (value === 'ALL') {
@@ -211,7 +270,7 @@ export default function TaskDetailForm() {
             <Content>
                 <Section>
                     <SectionTitle>과제 제출 및 조회</SectionTitle>
-                    <Input placeholder="과제 제목을 입력하세요." value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Input placeholder="과제 제목을 입력하세요." value={title} onChange={(e) => setTitle(e.target.value)} disabled={!editing} />
                     <Row>
                         <div style={{ position: 'relative' }} ref={dropdownRef}>
                             <DisplayBox onClick={() => setShowDropdown(!showDropdown)}>{renderParticipantDisplay()}</DisplayBox>
@@ -237,17 +296,29 @@ export default function TaskDetailForm() {
                     {tasks.map((task, idx) => (
                         <TaskCard key={idx}>
                             <Label>과제 {idx + 1} 제목</Label>
-                            <Input placeholder="과제 제목을 입력하세요." value={task.title} onChange={(e) => handleTaskChange(idx, 'title', e.target.value)} />
+                            <Input placeholder="과제 제목을 입력하세요." value={task.title} onChange={(e) => handleTaskChange(idx, 'title', e.target.value)} disabled={!editing}/>
                             <Label>상세 항목</Label>
-                            <Input placeholder="상세 항목 입력" value={task.detail} onChange={(e) => handleTaskChange(idx, 'detail', e.target.value)} />
+                            <Input placeholder="상세 항목 입력" value={task.detail} onChange={(e) => handleTaskChange(idx, 'detail', e.target.value)} disabled={!editing}/>
                         </TaskCard>
                     ))}
-                    <AddButton onClick={addTask}>＋ 과제 내용 추가</AddButton>
+                    {editing && (
+                        <AddButton onClick={addTask}>＋ 과제 내용 추가</AddButton>
+                    )}
                 </Section>
 
                 <ButtonGroup>
-                    <ActionButton>수정</ActionButton>
-                    <ActionButton>저장</ActionButton>
+                    {!editing ? (
+                        <ActionButton onClick={() => setEditing(true)}>수정</ActionButton> // 수정 모드 진입
+                    ) : (
+                        <ActionButton
+                            onClick={async () => {
+                                await handleUpdate(); // 수정 요청
+                                setEditing(false);    // 읽기 전용 모드로 전환
+                            }}
+                        >
+                            저장
+                        </ActionButton>
+                    )}
                 </ButtonGroup>
             </Content>
         </Container>
