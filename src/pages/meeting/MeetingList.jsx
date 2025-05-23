@@ -27,7 +27,6 @@ export default function MeetingList() {
             <Sidebar />
             <Content>
                 <Header />
-                <Title>회의록 리스트</Title>
                 <MeetingTable />
             </Content>
         </Container>

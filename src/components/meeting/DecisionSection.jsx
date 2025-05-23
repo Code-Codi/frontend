@@ -51,31 +51,58 @@ const AddButton = styled.button`
   margin-top: 10px;
 `;
 
-export default function DecisionSection({ decisions, setDecisions }) {
+const DeleteIcon = styled.div`
+  cursor: pointer;
+  font-size: 20px;
+  color: #888;
+  margin-left: 8px;
+
+  &:hover {
+    color: red;
+  }
+`;
+
+export default function DecisionSection({ decisions, setDecisions, editing, setDeletedDecisionIds }) {
     const handleChange = (index, value) => {
         const updated = [...decisions];
-        updated[index] = value;
+        updated[index] = {
+            ...(typeof updated[index] === 'string' ? { id: undefined } : updated[index]),
+            content: value,
+        };
         setDecisions(updated);
     };
 
     const addDecision = () => {
-        setDecisions([...decisions, '']);
+        setDecisions([...decisions, { content: '' }]);
+    };
+    const deleteDecision = (index) => {
+        const removed = decisions[index];
+        const updated = [...decisions];
+        updated.splice(index, 1);
+        setDecisions(updated);
+
+        // 삭제 대상 ID 등록
+        if (removed.id) {
+            setDeletedDecisionIds(prev => [...prev, removed.id]);
+        }
     };
 
     return (
         <Section>
             <Title>결정 사항</Title>
             {decisions.map((item, index) => (
-                <Row key={index}>
+                <Row key={item.id || index}>
                     <Badge>{index + 1}</Badge>
                     <Input
                         placeholder="결정 사항 내용을 입력하세요."
-                        value={item}
+                        value={item.content}
                         onChange={(e) => handleChange(index, e.target.value)}
+                        disabled={!editing}
                     />
+                    {editing && <DeleteIcon onClick={() => deleteDecision(index)}>🗑</DeleteIcon>}
                 </Row>
             ))}
-            <AddButton onClick={addDecision}>＋ 결정 사항 추가</AddButton>
+            {editing && <AddButton onClick={addDecision}>＋ 결정 사항 추가</AddButton>}
         </Section>
     );
 }

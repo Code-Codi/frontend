@@ -27,7 +27,8 @@ function App() {
       <Routes>
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/meetingList" element={<MeetingList />} />
-        <Route path="/meetingDetail" element={<MeetingDetail />} />
+        <Route path="/meetingDetail/:meetingId" element={<MeetingDetail />} />
+        <Route path="/meetingCreate" element={<MeetingDetail />} />
         <Route path="/taskList" element={<TaskList />} />
         <Route path="/taskDetail/:taskId" element={<TaskDetail/>} />
         <Route path="/taskCreate" element={<TaskDetail />} />
