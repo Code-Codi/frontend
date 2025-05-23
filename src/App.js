@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Schedule from "./pages/schedule/Schedule";
 import MeetingList from "./pages/meeting/MeetingList";
 import MeetingDetail from "./pages/meeting/MeetingDetailForm";
+import TaskList from "./pages/task/TaskList";
+import TaskDetail from "./pages/task/TaskDetailForm";
 //import Project from "./pages/project/ProjectHome"
 import Project from "./pages/project/Project"
 import Sidebar from "./components/sidebar/Sidebar";
@@ -26,6 +28,8 @@ function App() {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/meetingList" element={<MeetingList />} />
         <Route path="/meetingDetail" element={<MeetingDetail />} />
+        <Route path="/taskList" element={<TaskList />} />
+        <Route path="/taskDetail" element={<TaskDetail/>} />
         <Route path="/project" element={<Project />} />
         <Route path="/project/subProject" element={<Project />} />
       </Routes>
