@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import {useParams, useLocation, useNavigate} from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -142,6 +142,22 @@ export default function TaskDetailForm() {
     const dropdownRef = useRef(null);
     const [editing, setEditing] = useState(false);
     const participantOptions = ['ALL', '세미', '수현', '민경', '세령'];
+    const location = useLocation();
+    const isCreateMode = location.pathname === '/taskCreate';
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // taskDetail 페이지에 진입했을 때는 무조건 읽기 전용
+        if (taskId && location.pathname.startsWith('/taskDetail')) {
+            setEditing(false);
+        }
+    }, [taskId, location.pathname]);
+
+    useEffect(() => {
+        if (!taskId && location.pathname === '/taskCreate') {
+            setEditing(true); //  taskCreate로 들어온 경우 자동 편집 모드 ON
+        }
+    }, [taskId, location.pathname]);
 
     useEffect(() => {
         if (taskId) {
@@ -188,6 +204,8 @@ export default function TaskDetailForm() {
             }
 
             alert("과제가 성공적으로 등록되었습니다!");
+
+            navigate(`/taskDetail/${taskId}`);
         } catch (error) {
             console.error("등록 중 오류:", error);
             alert("과제 등록에 실패했습니다.");
@@ -307,19 +325,15 @@ export default function TaskDetailForm() {
                 </Section>
 
                 <ButtonGroup>
-                    {!editing ? (
-                        <ActionButton onClick={() => setEditing(true)}>수정</ActionButton> // 수정 모드 진입
+                    {isCreateMode ? (
+                        <ActionButton onClick={handleCreate}>등록</ActionButton>
+                    ) : !editing ? (
+                        <ActionButton onClick={() => setEditing(true)}>수정</ActionButton>
                     ) : (
-                        <ActionButton
-                            onClick={async () => {
-                                await handleUpdate(); // 수정 요청
-                                setEditing(false);    // 읽기 전용 모드로 전환
-                            }}
-                        >
-                            저장
-                        </ActionButton>
+                        <ActionButton onClick={handleUpdate}>저장</ActionButton>
                     )}
                 </ButtonGroup>
+
             </Content>
         </Container>
     );
