@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Schedule from "./pages/schedule/Schedule";
 import MeetingList from "./pages/meeting/MeetingList";
 import MeetingDetail from "./pages/meeting/MeetingDetailForm";
+//import Project from "./pages/project/ProjectHome"
+import Project from "./pages/project/Project"
 import Sidebar from "./components/sidebar/Sidebar";
 import Header from "./components/Header/Header";
 import { createGlobalStyle } from 'styled-components';
@@ -24,6 +26,8 @@ function App() {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/meetingList" element={<MeetingList />} />
         <Route path="/meetingDetail" element={<MeetingDetail />} />
+        <Route path="/project" element={<Project />} />
+        <Route path="/project/subProject" element={<Project />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,4 +1,9 @@
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import {
+  createSchedule,
+  updateSchedule,
+} from "../../../api/schedule/scheduleAPI";
 
 const Overlay = styled.div`
   position: fixed;
@@ -132,7 +137,130 @@ const SubmitButton = styled.button`
   }
 `;
 
-const ScheduleCreateModal = ({ onClose }) => {
+const ScheduleCreateModal = ({
+  selectedDate,
+  onClose,
+  mode = "create",
+  schedule,
+  onSaveSuccess,
+}) => {
+  const [teamId, setTeamId] = useState(1); // 임시 설정ㅇ
+  const [title, setTitle] = useState("");
+
+  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("00:00");
+  const [startLocalDateTime, setStartLocalDateTime] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("00:00");
+  const [endLocalDateTime, setEndLocalDateTime] = useState("");
+
+  const [content, setContent] = useState("");
+
+  const formatLocalDateTimeToDateString = (localDateTime) => {
+    if (!localDateTime || !localDateTime._date) return "";
+
+    const year = localDateTime._date._year;
+    const month = String(localDateTime._date._month).padStart(2, "0");
+    const day = String(localDateTime._date._day).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  useEffect(() => {
+    if (mode === "edit" && schedule) {
+      setTitle(schedule.title || "");
+
+      const start = new Date(schedule.startDate);
+      const end = new Date(schedule.endDate);
+      setStartDate(start.toISOString().slice(0, 10));
+      setStartTime(start.toISOString().slice(11, 16));
+      setStartLocalDateTime(schedule.startDate);
+      setEndDate(end.toISOString().slice(0, 10));
+      setEndTime(end.toISOString().slice(11, 16));
+      setEndLocalDateTime(schedule.endDate);
+      setContent(schedule.content || "");
+      setTeamId(schedule.teamId || 1);
+    } else if (mode === "create" && selectedDate) {
+      const formattedDate = formatLocalDateTimeToDateString(selectedDate);
+      setStartDate(formattedDate);
+      setEndDate(formattedDate);
+      if (formattedDate) {
+        setStartLocalDateTime(`${formattedDate}T${startTime}:00`);
+        setEndLocalDateTime(`${formattedDate}T${endTime}:00`);
+      }
+    }
+  }, [mode, schedule, selectedDate]);
+
+  const combineDateTime = (date, time) => {
+    return date && time ? `${date}T${time}:00` : "";
+  };
+
+  const handleDateTimeChange = (date, time, setDateTime, label) => {
+    const combined = combineDateTime(date, time);
+    setDateTime(combined);
+  };
+
+  const onStartDateChange = (e) => {
+    const newDate = e.target.value;
+    setStartDate(newDate);
+    handleDateTimeChange(newDate, startTime, setStartLocalDateTime, "Start");
+  };
+
+  const onStartTimeChange = (e) => {
+    const newTime = e.target.value;
+    setStartTime(newTime);
+    handleDateTimeChange(startDate, newTime, setStartLocalDateTime, "Start");
+  };
+
+  const onEndDateChange = (e) => {
+    const newDate = e.target.value;
+    setEndDate(newDate);
+    handleDateTimeChange(newDate, endTime, setEndLocalDateTime, "End");
+  };
+
+  const onEndTimeChange = (e) => {
+    const newTime = e.target.value;
+    setEndTime(newTime);
+    handleDateTimeChange(endDate, newTime, setEndLocalDateTime, "End");
+  };
+
+  const handleSubmit = async () => {
+    if (!title) {
+      alert("제목을 입력해주세요.");
+      return;
+    }
+
+    if (title.length > 20) {
+      alert("제목은 20자 이내로 입력해주세요.");
+      return;
+    }
+
+    if (content.length > 50) {
+      alert("내용은 50자 이내로 입력해주세요.");
+      return;
+    }
+
+    const scheduleData = {
+      teamId: teamId, // 임시 설정
+      title: title,
+      startDate: startLocalDateTime,
+      endDate: endLocalDateTime,
+      content: content,
+    };
+
+    try {
+      if (mode === "create") {
+        await createSchedule(scheduleData);
+      } else if (mode === "edit") {
+        await updateSchedule(schedule.id, scheduleData);
+      }
+      onSaveSuccess();
+      onClose();
+    } catch (error) {
+      console.error("스케줄 등록 실패:", error);
+    }
+  };
+
   return (
     <Overlay onClick={(e) => e.target === e.currentTarget && onClose()}>
       <ModalContainer>
@@ -142,7 +270,12 @@ const ScheduleCreateModal = ({ onClose }) => {
           <Label>
             제목 <span>*</span>
           </Label>
-          <InputBox placeholder="제목을 입력하세요" />
+          <InputBox
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="제목을 입력하세요"
+          />
         </FieldContainer>
 
         <FieldContainer>
@@ -152,13 +285,29 @@ const ScheduleCreateModal = ({ onClose }) => {
           <PeriodContainer>
             <TimeBox>
               <label>시작</label>
-              <TimeInput type="date" />
-              <TimeInput type="time" />
+              <TimeInput
+                type="date"
+                value={startDate}
+                onChange={onStartDateChange}
+              />
+              <TimeInput
+                type="time"
+                value={startTime}
+                onChange={onStartTimeChange}
+              />
             </TimeBox>
             <TimeBox>
               <label>종료</label>
-              <TimeInput type="date" />
-              <TimeInput type="time" />
+              <TimeInput
+                type="date"
+                value={endDate}
+                onChange={onEndDateChange}
+              />
+              <TimeInput
+                type="time"
+                value={endTime}
+                onChange={onEndTimeChange}
+              />
             </TimeBox>
           </PeriodContainer>
         </FieldContainer>
@@ -166,12 +315,16 @@ const ScheduleCreateModal = ({ onClose }) => {
         <MemoContainer>
           <Label>메모</Label>
           <MemoInputContainer>
-            <MemoBox placeholder="메모를 입력하세요" />
+            <MemoBox
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="메모를 입력하세요"
+            />
           </MemoInputContainer>
         </MemoContainer>
 
         <SubmitContainer>
-          <SubmitButton onClick={onClose}>등록</SubmitButton>
+          <SubmitButton onClick={handleSubmit}>등록</SubmitButton>
         </SubmitContainer>
       </ModalContainer>
     </Overlay>

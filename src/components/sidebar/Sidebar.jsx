@@ -72,7 +72,7 @@ const ColoredIconBox = styled.div`
 const items = [
   { label: "홈", icon: HomeIcon },
   { label: "가이드라인", icon: GuidelineIcon },
-  { label: "프로젝트", icon: ProjectIcon },
+  { label: "프로젝트", icon: ProjectIcon, path: "/project"},
   { label: "캘린더", icon: CalendarIcon, path: "/schedule" },
   { label: "회의록", icon: MeetingIcon,path: "/meetingList" },
   { label: "과제", icon: TaskIcon },

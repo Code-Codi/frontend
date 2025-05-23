@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { deleteSchedule } from "../../../api/schedule/scheduleAPI";
 
 const Overlay = styled.div`
   position: fixed;
@@ -59,14 +60,22 @@ const DeleteButton = styled(Button)`
   color: white;
 `;
 
-const ScheduleDeleteModal = ({ onClose, onDelete }) => {
+const ScheduleDeleteModal = ({ scheduleId, onClose, onDeleteSuccess }) => {
+  const handleDelete = async () => {
+    try {
+      await deleteSchedule(scheduleId);
+      onDeleteSuccess();
+      onClose();
+    } catch (error) {}
+  };
+
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <Title>일정을 삭제하시겠습니까?</Title>
         <ButtonContainer>
           <CancelButton onClick={onClose}>취소</CancelButton>
-          <DeleteButton onClick={onDelete}>삭제</DeleteButton>
+          <DeleteButton onClick={handleDelete}>삭제</DeleteButton>
         </ButtonContainer>
       </ModalContainer>
     </Overlay>
