@@ -133,6 +133,28 @@ const ActionButton = styled.button`
   }
 `;
 
+const DeleteButton = styled(ActionButton)`
+  background: white;
+  color: red;
+  border: 1px solid red;
+
+  &:hover {
+    background: red;
+    color: white;
+  }
+`;
+
+const DeleteIcon = styled.div`
+    cursor: pointer;
+    font-size: 35px;
+    color: #888;
+    padding: 4px;
+
+    &:hover {
+        color: red;
+    }
+`;
+
 export default function TaskDetailForm() {
     const { taskId } = useParams();
     const [title, setTitle] = useState('');
@@ -147,15 +169,11 @@ export default function TaskDetailForm() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // taskDetail 페이지에 진입했을 때는 무조건 읽기 전용
+        if (!taskId && isCreateMode) {
+            setEditing(true);
+        }
         if (taskId && location.pathname.startsWith('/taskDetail')) {
             setEditing(false);
-        }
-    }, [taskId, location.pathname]);
-
-    useEffect(() => {
-        if (!taskId && location.pathname === '/taskCreate') {
-            setEditing(true); //  taskCreate로 들어온 경우 자동 편집 모드 ON
         }
     }, [taskId, location.pathname]);
 
@@ -202,9 +220,7 @@ export default function TaskDetailForm() {
                     content: task.detail,
                 });
             }
-
             alert("과제가 성공적으로 등록되었습니다!");
-
             navigate(`/taskDetail/${taskId}`);
         } catch (error) {
             console.error("등록 중 오류:", error);
@@ -223,15 +239,20 @@ export default function TaskDetailForm() {
 
             // 2. TaskDetail 각각 수정
             for (const task of tasks) {
-                if (!task.id) {
-                    console.warn("TaskDetail ID가 없습니다. 생략됨:", task);
-                    continue;
+                if (task.id) {
+                    // 기존 항목 → 수정
+                    await axios.patch(`http://localhost:8080/task-details/${task.id}`, {
+                        title: task.title,
+                        content: task.detail,
+                    });
+                } else {
+                    // 새 항목 → 생성
+                    await axios.post("http://localhost:8080/task-details", {
+                        taskId: taskId,
+                        title: task.title,
+                        content: task.detail,
+                    });
                 }
-
-                await axios.patch(`http://localhost:8080/task-details/${task.id}`, {
-                    title: task.title,
-                    content: task.detail,
-                });
             }
 
             alert("과제가 성공적으로 수정되었습니다!");
@@ -242,6 +263,34 @@ export default function TaskDetailForm() {
         }
     };
 
+    const handleDeleteTask = async () => {
+        const confirm = window.confirm("정말 이 과제를 삭제하시겠습니까?");
+        if (!confirm || !taskId) return;
+        try {
+            await axios.delete(`http://localhost:8080/tasks/${taskId}`);
+            alert("과제가 삭제되었습니다.");
+            navigate("/taskList"); // 삭제 후 목록으로 이동
+        } catch (error) {
+            console.error("과제 삭제 실패:", error);
+            alert("과제 삭제에 실패했습니다.");
+        }
+    };
+
+    const handleDeleteDetail = async (idx, detailId) => {
+        const confirm = window.confirm("정말 이 과제 내용을 삭제하시겠습니까?");
+        if (!confirm) return;
+        try {
+            if (detailId) {
+                await axios.delete(`http://localhost:8080/task-details/${detailId}`);
+            }
+            const updated = [...tasks];
+            updated.splice(idx, 1);
+            setTasks(updated);
+        } catch (error) {
+            console.error("상세 과제 삭제 실패:", error);
+            alert("과제 상세 내용 삭제에 실패했습니다.");
+        }
+    };
 
     const handleToggleSelect = (value) => {
         if (value === 'ALL') {
@@ -313,12 +362,26 @@ export default function TaskDetailForm() {
                     <SectionTitle>과제 내용</SectionTitle>
                     {tasks.map((task, idx) => (
                         <TaskCard key={idx}>
-                            <Label>과제 {idx + 1} 제목</Label>
-                            <Input placeholder="과제 제목을 입력하세요." value={task.title} onChange={(e) => handleTaskChange(idx, 'title', e.target.value)} disabled={!editing}/>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Label>과제 {idx + 1} 제목</Label>
+                                {editing && <DeleteIcon onClick={() => handleDeleteDetail(idx, task.id)}>🗑</DeleteIcon>}
+                            </div>
+                            <Input
+                                placeholder="과제 제목을 입력하세요."
+                                value={task.title}
+                                onChange={(e) => handleTaskChange(idx, 'title', e.target.value)}
+                                disabled={!editing}
+                            />
                             <Label>상세 항목</Label>
-                            <Input placeholder="상세 항목 입력" value={task.detail} onChange={(e) => handleTaskChange(idx, 'detail', e.target.value)} disabled={!editing}/>
+                            <Input
+                                placeholder="상세 항목 입력"
+                                value={task.detail}
+                                onChange={(e) => handleTaskChange(idx, 'detail', e.target.value)}
+                                disabled={!editing}
+                            />
                         </TaskCard>
                     ))}
+
                     {editing && (
                         <AddButton onClick={addTask}>＋ 과제 내용 추가</AddButton>
                     )}
@@ -330,7 +393,11 @@ export default function TaskDetailForm() {
                     ) : !editing ? (
                         <ActionButton onClick={() => setEditing(true)}>수정</ActionButton>
                     ) : (
-                        <ActionButton onClick={handleUpdate}>저장</ActionButton>
+                        <>
+                            <DeleteButton onClick={handleDeleteTask}>삭제</DeleteButton>
+                            <ActionButton onClick={handleUpdate}>저장</ActionButton>
+
+                        </>
                     )}
                 </ButtonGroup>
 
