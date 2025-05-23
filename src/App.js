@@ -44,6 +44,11 @@ function App() {
           <Route path="guide" element={<GuideList/>} />
           <Route path="guide/:postId" element={<GuideDetail/>} />
           <Route path="guide/write" element={<GuideWrite />} />
+
+          {/* 로그인 */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          
         </Route>
       </Routes>
     </BrowserRouter>
