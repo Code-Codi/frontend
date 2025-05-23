@@ -111,6 +111,18 @@ const ActionButton = styled.button`
   }
 `;
 
+const DeleteButton = styled(ActionButton)`
+  background: white;
+  color: red;
+  border: 1px solid red;
+
+  &:hover {
+    background: red;
+    color: white;
+  }
+`;
+
+
 export default function MeetingDetailForm() {
     const { meetingId } = useParams();
     const location = useLocation();
@@ -128,6 +140,10 @@ export default function MeetingDetailForm() {
 
     const [agendas, setAgendas] = useState([{ title: '', details: [''] }]);
     const [decisions, setDecisions] = useState(['']);
+
+    const [deletedAgendaDetailIds, setDeletedAgendaDetailIds] = useState([]);
+    const [deletedDecisionIds, setDeletedDecisionIds] = useState([]);
+
 
     const participantOptions = ['ALL', '세미', '수현', '민경', '세령'];
     const handleCreate = async () => {
@@ -176,7 +192,6 @@ export default function MeetingDetailForm() {
 
     const handleUpdate = async () => {
         try {
-            // 1. Meeting 자체 수정
             const formattedDateTime = `${date}T00:00:00`;
             await axios.patch(`http://localhost:8080/meeting/${meetingId}`, {
                 title,
@@ -184,32 +199,38 @@ export default function MeetingDetailForm() {
                 location: locationName,
             });
 
-            // 2. Agenda + AgendaDetail 수정/등록
+            // 삭제된 AgendaDetail 먼저 삭제
+            for (const id of deletedAgendaDetailIds) {
+                await axios.delete(`http://localhost:8080/meeting/item/agenda-detail/${id}`);
+            }
+
+            // 삭제된 Decision 먼저 삭제
+            for (const id of deletedDecisionIds) {
+                await axios.delete(`http://localhost:8080/meeting/item/decision/${id}`);
+            }
+
+            // Agenda 수정/생성
             for (const agenda of agendas) {
                 let agendaId = agenda.id;
-
-                // 기존 agenda 수정
                 if (agendaId) {
                     await axios.patch(`http://localhost:8080/meeting/item/agenda/${agendaId}`, {
                         title: agenda.title
                     });
                 } else {
-                    // 새 agenda 등록
-                    const agendaRes = await axios.post("http://localhost:8080/meeting/item/agenda", {
+                    const res = await axios.post(`http://localhost:8080/meeting/item/agenda`, {
                         meetingId,
                         title: agenda.title
                     });
-                    agendaId = agendaRes.data.result;
+                    agendaId = res.data.result;
                 }
 
-                // AgendaDetail 수정/등록
                 for (const detail of agenda.details) {
                     if (detail.id) {
                         await axios.patch(`http://localhost:8080/meeting/item/agenda-detail/${detail.id}`, {
                             content: detail.content
                         });
                     } else {
-                        await axios.post("http://localhost:8080/meeting/item/agenda-detail", {
+                        await axios.post(`http://localhost:8080/meeting/item/agenda-detail`, {
                             agendaId,
                             content: detail.content
                         });
@@ -217,7 +238,7 @@ export default function MeetingDetailForm() {
                 }
             }
 
-            // 3. Decision 수정/등록
+            // Decision 수정/생성
             for (const decision of decisions) {
                 if (decision.id) {
                     await axios.patch(`http://localhost:8080/meeting/item/decision/${decision.id}`, {
@@ -231,6 +252,10 @@ export default function MeetingDetailForm() {
                 }
             }
 
+            // 삭제 목록 초기화
+            setDeletedAgendaDetailIds([]);
+            setDeletedDecisionIds([]);
+
             alert("회의록이 성공적으로 수정되었습니다!");
             setEditing(false);
         } catch (error) {
@@ -239,6 +264,21 @@ export default function MeetingDetailForm() {
         }
     };
 
+
+    const handleDeleteMeeting = async () => {
+        if (!meetingId) return;
+        const confirm = window.confirm("정말 이 회의록을 삭제하시겠습니까?");
+        if (!confirm) return;
+
+        try {
+            await axios.delete(`http://localhost:8080/meeting/${meetingId}`);
+            alert("회의록이 삭제되었습니다.");
+            navigate("/meetingList");
+        } catch (err) {
+            console.error("삭제 실패:", err);
+            alert("삭제에 실패했습니다.");
+        }
+    };
 
     useEffect(() => {
         const fetchMeeting = async () => {
@@ -338,8 +378,8 @@ export default function MeetingDetailForm() {
                     </Row>
                 </Section>
 
-                <AgendaSection agendas={agendas} setAgendas={setAgendas}  editing={editing} />
-                <DecisionSection decisions={decisions} setDecisions={setDecisions}  editing={editing} />
+                <AgendaSection agendas={agendas} setAgendas={setAgendas}  editing={editing} setDeletedAgendaDetailIds={setDeletedAgendaDetailIds}/>
+                <DecisionSection decisions={decisions} setDecisions={setDecisions}  editing={editing} setDeletedDecisionIds={setDeletedDecisionIds}/>
 
                 <ButtonGroup>
                     {isCreateMode ? (
@@ -347,7 +387,10 @@ export default function MeetingDetailForm() {
                     ) : !editing ? (
                         <ActionButton onClick={() => setEditing(true)}>수정</ActionButton>
                     ) : (
-                        <ActionButton onClick={handleUpdate}>저장</ActionButton>
+                        <>
+                            <DeleteButton onClick={handleDeleteMeeting}>전체 삭제</DeleteButton>
+                            <ActionButton onClick={handleUpdate}>저장</ActionButton>
+                        </>
                     )}
                 </ButtonGroup>
             </Content>

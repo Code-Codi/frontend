@@ -23,7 +23,7 @@ const AddButton = styled.button`
   margin-top: 20px;
 `;
 
-export default function AgendaSection({ agendas, setAgendas, editing }) {
+export default function AgendaSection({ agendas, setAgendas, editing, setDeletedAgendaDetailIds}) {
     const addAgenda = () => {
         setAgendas([...agendas, { title: '', details: [{ content: '' }] }]);
     };
@@ -39,6 +39,7 @@ export default function AgendaSection({ agendas, setAgendas, editing }) {
                     agendas={agendas}
                     setAgendas={setAgendas}
                     editing={editing}
+                    setDeletedAgendaDetailIds={setDeletedAgendaDetailIds}
                 />
             ))}
             {editing && <AddButton onClick={addAgenda}>＋ 안건 추가</AddButton>}
