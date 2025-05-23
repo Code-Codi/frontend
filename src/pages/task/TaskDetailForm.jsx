@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -132,6 +134,7 @@ const ActionButton = styled.button`
 `;
 
 export default function TaskDetailForm() {
+    const { taskId } = useParams();
     const [title, setTitle] = useState('');
     const [participants, setParticipants] = useState([]);
     const [tasks, setTasks] = useState([{ title: '', detail: '' }]);
@@ -139,6 +142,29 @@ export default function TaskDetailForm() {
     const dropdownRef = useRef(null);
 
     const participantOptions = ['ALL', '세미', '수현', '민경', '세령'];
+
+    useEffect(() => {
+        const fetchTask = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/tasks/${taskId}`);
+                const data = response.data;
+
+                setTitle(data.title);
+                setTasks(
+                    data.details.map((detail) => ({
+                        title: detail.title,
+                        detail: detail.content
+                    }))
+                );
+            } catch (error) {
+                console.error('과제 정보를 불러오는 데 실패했습니다:', error);
+            }
+        };
+
+        if (taskId) {
+            fetchTask();
+        }
+    }, [taskId]);
 
     const handleToggleSelect = (value) => {
         if (value === 'ALL') {
