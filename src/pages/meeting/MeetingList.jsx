@@ -1,5 +1,3 @@
-import Header from "../../components/header/Header";
-import Sidebar from "../../components/sidebar/Sidebar";
 import MeetingTable from "../../components/meeting/MeetingTable";
 import styled from "styled-components";
 
@@ -24,9 +22,7 @@ const Title = styled.h2`
 export default function MeetingList() {
   return (
     <Container>
-      <Sidebar />
       <Content>
-        <Header />
         <MeetingTable />
       </Content>
     </Container>
