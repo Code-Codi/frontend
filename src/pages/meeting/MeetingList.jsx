@@ -1,6 +1,6 @@
-import Header from '../../components/Header/Header';
-import Sidebar from '../../components/sidebar/Sidebar';
-import MeetingTable from '../../components/meeting/MeetingTable';
+import Header from "../../components/header/Header";
+import Sidebar from "../../components/sidebar/Sidebar";
+import MeetingTable from "../../components/meeting/MeetingTable";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -16,19 +16,19 @@ const Content = styled.div`
 
 const Title = styled.h2`
   font-size: 20px;
-  color: #343C6A;
+  color: #343c6a;
   font-weight: bold;
   margin-bottom: 30px;
 `;
 
 export default function MeetingList() {
-    return (
-        <Container>
-            <Sidebar />
-            <Content>
-                <Header />
-                <MeetingTable />
-            </Content>
-        </Container>
-    );
+  return (
+    <Container>
+      <Sidebar />
+      <Content>
+        <Header />
+        <MeetingTable />
+      </Content>
+    </Container>
+  );
 }
