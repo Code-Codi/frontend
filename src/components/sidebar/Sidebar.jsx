@@ -49,7 +49,7 @@ const SidebarIndicator = styled.div`
   width: 6px;
   height: 60px;
   position: absolute;
-  left: -70px;
+  margin-left: -70px;
   top: ${({ index }) => index * 75}px;
   background: #1814f3;
   border-top-right-radius: 10px;
