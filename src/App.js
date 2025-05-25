@@ -7,7 +7,7 @@ import TaskDetail from "./pages/task/TaskDetailForm";
 //import Project from "./pages/project/ProjectHome"
 import Project from "./pages/project/Project";
 import Sidebar from "./components/sidebar/Sidebar";
-import Header from "./components/header/Header";
+import Header from "./components/Header/Header";
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`

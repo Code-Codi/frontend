@@ -1,5 +1,3 @@
-import Header from "../../components/header/Header";
-import Sidebar from "../../components/sidebar/Sidebar";
 import styled from "styled-components";
 import TaskTable from "../../components/task/TaskTable";
 
@@ -24,9 +22,7 @@ const Title = styled.h2`
 export default function TaskList() {
   return (
     <Container>
-      <Sidebar />
       <Content>
-        <Header />
         <TaskTable />
       </Content>
     </Container>
