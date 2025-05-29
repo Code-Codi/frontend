@@ -1,4 +1,4 @@
-.task-modal-overlay {
+.team-project-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -9,13 +9,12 @@
   backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
-  align-items: center; 
-  padding: 20px; 
+  align-items: center;
+  padding: 20px;
   overflow: auto;
 }
 
-.task-modal {
-  position: relative;
+.team-project-modal {
   width: 550px;
   max-height: calc(80vh - 90px);
   overflow-y: auto;
@@ -28,7 +27,7 @@
   gap: 18px;
 }
 
-.task-modal h3 {
+.team-project-modal h3 {
   font-size: 22px;
   font-weight: 600;
   margin-bottom: 10px;
@@ -41,16 +40,16 @@
   color: #888;
 }
 
-.task-modal label {
+.team-project-modal label {
   display: flex;
   flex-direction: column;
   font-size: 14px;
   color: #444;
 }
 
-.task-modal input,
-.task-modal textarea,
-.task-modal select {
+.team-project-modal input,
+.team-project-modal textarea,
+.team-project-modal select {
   margin-top: 6px;
   padding: 10px;
   font-size: 14px;
@@ -59,7 +58,7 @@
   margin-bottom: 15px;
 }
 
-.task-modal textarea {
+.team-project-modal textarea {
   resize: vertical;
   min-height: 60px;
 }
@@ -73,23 +72,23 @@
 .modal-top-header {
   text-align: left;
   margin-bottom: 16px;
+
+  h2 {
+    font-size: 23px;
+    font-weight: bold;
+    color: #343c6a;
+    margin: 0;
+  }
 }
 
-.modal-top-header h2 {
-  font-size: 23px;
-  font-weight: bold;
-  color: #343c6a;
-  margin: 0;
-}
-
-.task-modal-actions {
+.team-project-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 12px;
 }
 
-.task-modal-actions button {
+.team-project-modal-actions button {
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
@@ -99,23 +98,27 @@
   font-weight: 500;
 }
 
-.task-modal-actions button:hover {
+.team-project-modal-actions button:hover {
   background-color: #3d37f1;
 }
 
-.task-delete-action {
+.team-project-delete-action {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
 }
 
 .delete-btn {
-  background-color: #ff4d4f !important;
+  background-color: #ff4d4f;
   color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
 }
 
 .delete-btn:hover {
-  background-color: #e60000 !important;
+  background-color: #e60000;
 }
 
 .confirm-overlay {
@@ -166,17 +169,11 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
-  position: relative;
 }
-.modal-header-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
+
 .edit-toggle-btn {
-  margin-right: 50px;
-  margin-top: 5px;
   font-size: 13px;
+  margin-right: 10px;
   background: none;
   border: none;
   color: #3d37f1;
@@ -202,21 +199,52 @@
   white-space: pre-line;
 }
 
-.modal-close-btn {
-  position: absolute;
-  top: 20px;
-  right: 0px;
-  font-size: 13px;
-  background: none;
+.member-list {
+  font-size: 14px;
+  color: #333;
+  margin: 10px 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.team-project-modal label > div {
+  display: flex;
+  gap: 10px;
+}
+
+.team-project-modal label > div input {
+  flex: 1;
+}
+.email-add-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.email-add-row input {
+  flex: 1;
+}
+
+.email-add-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #1814f3;
+  color: white;
   border: none;
-  color: #3d37f1;
-  cursor: pointer;
-  z-index: 1001;
-  padding: 4px 8px;
   border-radius: 8px;
+  cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.modal-close-btn:hover {
-  color: #000;
+.email-add-btn:hover {
+  background-color: #3d37f1;
+}
+.remove-member-btn {
+  margin-left: 8px;
+  background: transparent;
+  border: none;
+  color: #ff5a5a;
+  font-weight: bold;
+  cursor: pointer;
 }

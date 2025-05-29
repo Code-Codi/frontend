@@ -2,7 +2,23 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TaskModal.scss";
 
-export default function TaskModal({ status, onClose, initialData = null, refreshData }) {
+const mapToEnumStatus = (status) => {
+  switch (status) {
+    case "할일":
+    case "TODO":
+      return "TODO";
+    case "진행중":
+    case "INPROGRESS":
+      return "INPROGRESS";
+    case "완료":
+    case "COMPLETED":
+      return "COMPLETED";
+    default:
+      return "TODO";
+  }
+};
+
+export default function TaskModal({ status, onClose, initialData = null, refreshData, teamId }) {
   const [formData, setFormData] = useState({
     id: null,
     name: "",
@@ -12,7 +28,7 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
     startDate: "",
     targetDeadline: "",
     endDate: "",
-    status: status === "할일" ? "TODO" : status === "진행중" ? "INPROGRESS" : "COMPLETED",
+    status: mapToEnumStatus(status),
   });
 
   const [isEditMode, setIsEditMode] = useState(!initialData);
@@ -20,18 +36,9 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
 
   useEffect(() => {
     if (initialData) {
-      const convertedStatus =
-        initialData.status === "할일"
-          ? "TODO"
-          : initialData.status === "진행중"
-          ? "INPROGRESS"
-          : initialData.status === "완료"
-          ? "COMPLETED"
-          : initialData.status;
-
       setFormData({
         ...initialData,
-        status: convertedStatus,
+        status: mapToEnumStatus(initialData.status),
       });
     }
   }, [initialData]);
@@ -53,15 +60,15 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formData, teamId: 1 };
+    const payload = { ...formData, teamId };
 
     try {
       if (formData.id) {
         await axios.patch(`http://localhost:8080/project/${formData.id}`, payload);
-        refreshData(formData.id); 
+        refreshData(formData.id);
       } else {
         const res = await axios.post("http://localhost:8080/project", payload);
-        const createdId = res.data.result.id; 
+        const createdId = res.data.result.id;
         refreshData(createdId);
       }
       onClose();
@@ -81,34 +88,17 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
   };
 
   return (
-    <div
-      className="task-modal-overlay"
-      onClick={(e) => {
-        if (e.target.classList.contains("task-modal-overlay")) {
-          onClose();
-        }
-      }}
-    >
+    <div className="task-modal-overlay">
       <div className="task-modal">
-        {!initialData && (
-          <div className="modal-top-header">
-            <h2>프로젝트 생성</h2>
+        <div className="modal-header">
+          <h3>{formData.name || "새 프로젝트"}</h3>
+          <div className="modal-header-actions">
+            {!isEditMode && (
+              <button className="edit-toggle-btn" onClick={() => setIsEditMode(true)}>✏️ 수정</button>
+            )}
+            <button className="modal-close-btn" onClick={onClose}>✕</button>
           </div>
-        )}
-        {initialData && isEditMode && (
-          <div className="modal-top-header">
-            <h2>프로젝트 수정</h2>
-          </div>
-        )}
-
-        {!isEditMode && (
-          <div className="modal-header">
-            <h3>{formData.name || "새 프로젝트"}</h3>
-            <button className="edit-toggle-btn" onClick={() => setIsEditMode(true)}>
-              ✏️ 수정
-            </button>
-          </div>
-        )}
+        </div>
 
         <form onSubmit={handleSubmit}>
           {isEditMode && (
@@ -196,41 +186,24 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
           <div className="task-modal-actions">
             {isEditMode ? (
               <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (initialData) {
-                      setFormData({ ...initialData });
-                      setIsEditMode(false);
-                    } else {
-                      onClose();
-                    }
-                  }}
-                >
-                  취소
-                </button>
+                <button type="button" onClick={() => {
+                  if (initialData) {
+                    setFormData({ ...initialData, status: mapToEnumStatus(initialData.status) });
+                    setIsEditMode(false);
+                  } else {
+                    onClose();
+                  }
+                }}>취소</button>
                 <button type="submit">저장</button>
                 {formData.id && (
-                  <button
-                    type="button"
-                    className="delete-btn"
-                    onClick={() => setShowDeleteConfirm(true)}
-                  >
-                    🗑 삭제
-                  </button>
+                  <button type="button" className="delete-btn" onClick={() => setShowDeleteConfirm(true)}>🗑 삭제</button>
                 )}
               </>
             ) : (
               <>
                 <button type="button" onClick={onClose}>닫기</button>
                 {formData.id && (
-                  <button
-                    type="button"
-                    className="delete-btn"
-                    onClick={() => setShowDeleteConfirm(true)}
-                  >
-                    🗑 삭제
-                  </button>
+                  <button type="button" className="delete-btn" onClick={() => setShowDeleteConfirm(true)}>🗑 삭제</button>
                 )}
               </>
             )}

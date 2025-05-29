@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { ReactComponent as HomeIcon } from "../../assets/home.svg";
@@ -69,23 +69,35 @@ const ColoredIconBox = styled.div`
   }
 `;
 
+// 사이드바 항목 정의
 const items = [
   { label: "홈", icon: HomeIcon },
   { label: "가이드라인", icon: GuidelineIcon },
-  { label: "프로젝트", icon: ProjectIcon, path: "/project"},
+  { label: "프로젝트", icon: ProjectIcon, path: "/project" },
   { label: "캘린더", icon: CalendarIcon, path: "/schedule" },
   { label: "회의록", icon: MeetingIcon, path: "/meetingList" },
-  { label: "과제", icon: TaskIcon, path: "/taskList"  },
+  { label: "과제", icon: TaskIcon, path: "/taskList" },
   { label: "공유", icon: ShareIcon },
 ];
 
 const Sidebar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const teamId = queryParams.get("teamId");
 
   const handleItemClick = (index, path) => {
     setActiveIndex(index);
-    navigate(path);
+
+    if (path) {
+      if (teamId) {
+        navigate(`${path}?teamId=${teamId}`);
+      } else {
+        navigate(path);
+      }
+    }
   };
 
   return (
