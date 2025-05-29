@@ -34,6 +34,9 @@ function App() {
         <Route path="/taskCreate" element={<TaskDetail />} />
         <Route path="/project" element={<Project />} />
         <Route path="/project/subProject" element={<Project />} />
+        {/* 로그인 */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </BrowserRouter>
   );
