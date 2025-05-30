@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import {
   AuthWrapper, AuthCard, Title, Subtitle, SubmitButton
 } from "../../styles/Auth.styles";
-import InputField from "../../components/InputField";
-import api from "../../api/api";
+import InputField from "../../components/Login/InputField";
+import api from "../../api/login/login";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -14,19 +14,28 @@ const Login = () => {
 
 const handleLogin = async () => {
   try {
-    const response = await api.post("/login", {
+    const response = await api.login({
       email,
       password: pw,
     });
 
-    const token = response.data.token;
-    localStorage.setItem("token", token);
-    alert("로그인 성공!");
-    navigate("/share"); // ✅ 여기!
+    // 응답 구조: { isSuccess, code, message, result }
+    if (response.isSuccess) {
+      const username = response.result.username;
+      localStorage.setItem("username", username);
+
+      alert("로그인 성공!");
+      navigate("/share"); // 원하는 경로로 이동
+    } else {
+      alert(`로그인 실패: ${response.message}`);
+    }
+
   } catch (err) {
+    console.error("로그인 요청 에러:", err);
     alert("로그인 실패");
   }
 };
+
 
 
   return (

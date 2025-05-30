@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const Row = styled.tr`
   border-bottom: 1px solid #e6eff5;
@@ -26,6 +27,17 @@ const TitleCell = styled(Cell)`
 `;
 
 export default function PostRow({ post, boardType }) {
+
+const handleFavorite = async (postId) => {
+  try {
+    await axios.post(`/post/${postId}/favorite`);
+    window.location.reload();
+  } catch (e) {
+    console.error('Failed to favorite:', e);
+  }
+};
+
+
   return (
     <Row>
       <TitleCell>
@@ -33,11 +45,23 @@ export default function PostRow({ post, boardType }) {
           {post.title}
         </Link>
       </TitleCell>
-      <Cell>{post.teamName || '-'}</Cell>
-      <Cell>{post.type || '-'}</Cell>
+      <Cell>{post.writerId || '-'}</Cell>
       <Cell>{post.visitors || 0}</Cell>
       <Cell>{post.createdAt?.slice(0, 10) || '-'}</Cell>
-      <Cell>❤️ {post.favorites || 0}</Cell>
+      <Cell>❤️ {post.favorites || 0}
+         <button
+          onClick={handleFavorite}
+          style={{
+            marginLeft: '8px',
+            padding: '2px 6px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            cursor: 'pointer',
+            backgroundColor: 'white',
+          }}
+        >
+          ♡</button>
+      </Cell>
     </Row>
   );
 }

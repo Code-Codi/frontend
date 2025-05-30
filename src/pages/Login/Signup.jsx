@@ -2,28 +2,35 @@ import React, { useState } from "react";
 import {
   AuthWrapper, AuthCard, Title, SubmitButton
 } from "../../styles/Auth.styles";
-import InputField from "../../components/InputField";
-import api from "../../api/api";
+import InputField from "../../components/Login/InputField";
+import api from "../../api/login/login";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [birth, setBirth] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
+  const navigate = useNavigate();
 
   const handleSignup = async () => {
-    try {
-      await api.post("/signup", {
-        name,
-        birth,
-        email,
-        password: pw,
-      });
-      alert("회원가입 성공! 로그인 페이지로 이동합니다.");
-    } catch (err) {
-      alert("회원가입 실패");
-    }
-  };
+  try {
+    const res = await api.signup({
+      username: name,
+      birthDate: birth,
+      email,
+      password: pw,
+    });
+
+    console.log("회원가입 성공 응답:", res);
+    alert("회원가입 성공! 로그인 페이지로 이동합니다.");
+    navigate("/login");
+  } catch (err) {
+    console.error("회원가입 실패 원인:", err.response?.data || err.message);
+    alert("회원가입 실패");
+  }
+};
+
 
   return (
     <AuthWrapper>

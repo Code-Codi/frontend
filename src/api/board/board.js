@@ -1,62 +1,34 @@
+// src/api/board.js
 import axios from 'axios';
 
-/*const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // 백엔드 주소로 바꿔 주세요!
-});*/
+const BASE_URL = 'http://localhost:8080/post';
 
-// const dummyPosts = [
-//   { id: 1, title: '더미 글', teamName: 'Team A', favorites: 7, createdAt: '2025-05-22' },
-//   // …
-// ];
+export const getPosts = (type, page) =>
+  axios.get(`${BASE_URL}/${type}`, { params: { page } });
 
-// const dummyPopular = [
-//   {
-//     id: 101,
-//     title: '파이어베이스 채팅앱 완성본',
-//     teamName: 'Team Alpha',
-//     category: 'web',
-//     visitors: 523,
-//     favorites: 34,
-//     thumbnail: 'https://via.placeholder.com/320x180.png?text=ChatApp',
-//     createdAt: '2025-05-20'
-//   },
-//   {
-//     id: 88,
-//     title: 'AI 그림 추천 앱',
-//     teamName: 'Team Bravo',
-//     category: 'app',
-//     visitors: 418,
-//     favorites: 29,
-//     thumbnail: 'https://via.placeholder.com/320x180.png?text=AI+Art',
-//     createdAt: '2025-05-15'
-//   },
-//   {
-//     id: 76,
-//     title: '실시간 주가 대시보드',
-//     teamName: 'Team Charlie',
-//     category: 'web',
-//     visitors: 395,
-//     favorites: 25,
-//     thumbnail: 'https://via.placeholder.com/320x180.png?text=Stocks',
-//     createdAt: '2025-05-10'
-//   }
-// ];
+export const getPost = (type, id) =>
+  axios.get(`${BASE_URL}/${type}/${id}`);
 
-export const getPosts    = (type, page)      =>
-  api.get(`/${type}`,        { params: { page } });
+export const getComments = (postId) =>
+  axios.get(`${BASE_URL}/${postId}/comments`);
 
-export const getPost     = (type, id)        =>
-  api.get(`/${type}/${id}`);
+export const getPopular = () =>
+  axios.get(`${BASE_URL}/share/popular`);
 
-export const getComments = (postId)          =>
-  api.get(`/comments/${postId}`);
-
-export const getPopular  = ()                =>
-  api.get('/share/popular');
-
-// CREATE (추가) ---------------------
-export const createPost  = (type, dto)       =>
-  api.post(`/${type}`, dto);
+export const createPost = (formData) =>
+  axios.post(`${BASE_URL}/posts`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 
 export const postComment = (postId, comment) =>
-  axios.post(`/api/posts/${postId}/comments`, comment);
+  axios.post(`${BASE_URL}/${postId}/comments`, comment);
+
+// 게시글 삭제
+export const deletePost = (postId) => {
+  return axios.delete(`${BASE_URL}/${postId}`);
+};
+
+// 댓글 삭제
+export const deleteComment = (commentId, postId) => {
+  return axios.delete(`${BASE_URL}/${postId}/comments/${commentId}`);
+};
