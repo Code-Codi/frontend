@@ -89,16 +89,17 @@ export default function TaskModal({ status, onClose, initialData = null, refresh
 
   return (
     <div className="task-modal-overlay">
-      <div className="task-modal">
-        <div className="modal-header">
-          <h3>{formData.name || "새 프로젝트"}</h3>
-          <div className="modal-header-actions">
-            {!isEditMode && (
-              <button className="edit-toggle-btn" onClick={() => setIsEditMode(true)}>✏️ 수정</button>
-            )}
-            <button className="modal-close-btn" onClick={onClose}>✕</button>
-          </div>
-        </div>
+     <div className="task-modal">
+  <div className="modal-header">
+    <h3>{formData.name || "새 프로젝트"}</h3>
+    <div className="modal-header-actions">
+      {!isEditMode && (
+        <button className="edit-toggle-btn" onClick={() => setIsEditMode(true)}>✏️ 수정</button>
+      )}
+      <button className="modal-close-btn" onClick={onClose}>✕</button>
+    </div>
+  </div>
+
 
         <form onSubmit={handleSubmit}>
           {isEditMode && (

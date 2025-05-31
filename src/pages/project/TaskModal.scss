@@ -166,16 +166,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
-  position: relative;
 }
 .modal-header-actions {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 16px; // ✨ 간격 확보
 }
 .edit-toggle-btn {
-  margin-right: 50px;
-  margin-top: 5px;
   font-size: 13px;
   background: none;
   border: none;
@@ -203,15 +200,11 @@
 }
 
 .modal-close-btn {
-  position: absolute;
-  top: 20px;
-  right: 0px;
   font-size: 13px;
   background: none;
   border: none;
   color: #3d37f1;
   cursor: pointer;
-  z-index: 1001;
   padding: 4px 8px;
   border-radius: 8px;
   transition: background-color 0.2s;

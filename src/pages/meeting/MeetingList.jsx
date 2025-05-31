@@ -1,6 +1,4 @@
-import Header from '../../components/Header/Header';
-import Sidebar from '../../components/sidebar/Sidebar';
-import MeetingTable from '../../components/meeting/MeetingTable';
+import MeetingTable from "../../components/meeting/MeetingTable";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -16,20 +14,17 @@ const Content = styled.div`
 
 const Title = styled.h2`
   font-size: 20px;
-  color: #343C6A;
+  color: #343c6a;
   font-weight: bold;
   margin-bottom: 30px;
 `;
 
 export default function MeetingList() {
-    return (
-        <Container>
-            <Sidebar />
-            <Content>
-                <Header />
-                <Title>회의록 리스트</Title>
-                <MeetingTable />
-            </Content>
-        </Container>
-    );
+  return (
+    <Container>
+      <Content>
+        <MeetingTable />
+      </Content>
+    </Container>
+  );
 }

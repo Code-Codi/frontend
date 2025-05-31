@@ -1,7 +1,5 @@
-import Header from '../../components/Header/Header';
-import Sidebar from '../../components/sidebar/Sidebar';
 import styled from "styled-components";
-import TaskTable from '../../components/task/TaskTable';
+import TaskTable from "../../components/task/TaskTable";
 
 const Container = styled.div`
   display: flex;
@@ -16,19 +14,17 @@ const Content = styled.div`
 
 const Title = styled.h2`
   font-size: 20px;
-  color: #343C6A;
+  color: #343c6a;
   font-weight: bold;
   margin-bottom: 30px;
 `;
 
 export default function TaskList() {
-    return (
-        <Container>
-            <Sidebar />
-            <Content>
-                <Header />
-                <TaskTable />
-            </Content>
-        </Container>
-    );
+  return (
+    <Container>
+      <Content>
+        <TaskTable />
+      </Content>
+    </Container>
+  );
 }

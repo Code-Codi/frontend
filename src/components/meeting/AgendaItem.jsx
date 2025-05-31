@@ -35,7 +35,18 @@ const AddDetailButton = styled.button`
     margin-top: 12px;
 `;
 
-export default function AgendaItem({ index, agenda, agendas, setAgendas }) {
+const DeleteIcon = styled.div`
+  cursor: pointer;
+  font-size: 20px;
+  color: #888;
+  margin-left: 8px;
+
+  &:hover {
+    color: red;
+  }
+`;
+
+export default function AgendaItem({ index, agenda, agendas, setAgendas, editing, setDeletedAgendaDetailIds }) {
     const handleTitleChange = (value) => {
         const updated = [...agendas];
         updated[index].title = value;
@@ -44,34 +55,66 @@ export default function AgendaItem({ index, agenda, agendas, setAgendas }) {
 
     const handleDetailChange = (detailIndex, value) => {
         const updated = [...agendas];
-        updated[index].details[detailIndex] = value;
+        updated[index].details[detailIndex].content = value;
         setAgendas(updated);
     };
 
     const addDetail = () => {
         const updated = [...agendas];
-        updated[index].details.push('');
+        updated[index].details.push({ content: '' });
+        setAgendas(updated);
+    };
+
+    const deleteDetail = (detailIndex) => {
+        const updated = [...agendas];
+        const removed = updated[index].details.splice(detailIndex, 1)[0];
+        setAgendas(updated);
+
+        if (removed.id) {
+            setDeletedAgendaDetailIds(prev => [...prev, removed.id]);
+        }
+    };
+
+
+    const deleteAgenda = () => {
+        const target = agendas[index];
+        // agenda 내부 detail도 삭제 대상 등록
+        if (target.details) {
+            target.details.forEach(d => {
+                if (d.id) {
+                    setDeletedAgendaDetailIds(prev => [...prev, d.id]);
+                }
+            });
+        }
+        const updated = agendas.filter((_, i) => i !== index);
         setAgendas(updated);
     };
 
     return (
         <Card>
-            <Label>안건 {index + 1} 제목</Label>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Label>안건 {index + 1} 제목</Label>
+                {editing && <DeleteIcon onClick={deleteAgenda}>🗑</DeleteIcon>}
+            </div>
             <Input
                 placeholder="안건 제목을 입력하세요"
                 value={agenda.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
+                disabled={!editing}
             />
             <Label>상세 항목</Label>
             {agenda.details.map((detail, dIdx) => (
-                <Input
-                    key={dIdx}
-                    placeholder={`상세 항목 ${dIdx + 1}`}
-                    value={detail}
-                    onChange={(e) => handleDetailChange(dIdx, e.target.value)}
-                />
+                <div style={{ display: 'flex', alignItems: 'center' }} key={detail.id || dIdx}>
+                    <Input
+                        placeholder={`상세 항목 ${dIdx + 1}`}
+                        value={detail.content}
+                        onChange={(e) => handleDetailChange(dIdx, e.target.value)}
+                        disabled={!editing}
+                    />
+                    {editing && <DeleteIcon onClick={() => deleteDetail(dIdx)}>🗑</DeleteIcon>}
+                </div>
             ))}
-            <AddDetailButton onClick={addDetail}>＋ 안건 상세 추가</AddDetailButton>
+            {editing && <AddDetailButton onClick={addDetail}>＋ 안건 상세 추가</AddDetailButton>}
         </Card>
     );
 }
