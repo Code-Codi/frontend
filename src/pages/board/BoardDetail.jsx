@@ -153,25 +153,32 @@ const handleDeleteComment = async (commentId) => {
 
   return (
     <Wrapper>
-      {/* 게시글 카드 */}
       <Card>
-        <Title>{post.title}</Title>
-        {post.writerId === currentUserId && (
-  <Button onClick={handleDeletePost} style={{ marginBottom: '16px' }}>
-    게시글 삭제
-  </Button>
-)}
+  <Title>{post.title}</Title>
 
-        <ReactMarkdown
-          children={post.content}
-          remarkPlugins={[remarkGfm]}
-          components={{
-            img: ({ node, ...props }) => (
-              <img {...props} style={{ maxWidth: '100%', borderRadius: '8px' }} />
-            ),
-          }}
-        />
-      </Card>
+  {post.thumbnail && (
+    <img
+      src={`http://localhost:8080${post.thumbnail}`}
+      alt="thumbnail"
+      style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: '16px' }}
+    />
+  )}
+
+    <Button onClick={handleDeletePost} style={{ marginBottom: '16px' }}>
+      게시글 삭제
+    </Button>
+
+  <ReactMarkdown
+    children={post.content}
+    remarkPlugins={[remarkGfm]}
+    components={{
+      img: ({ node, ...props }) => (
+        <img {...props} style={{ maxWidth: '100%', borderRadius: '8px' }} />
+      ),
+    }}
+  />
+</Card>
+
 
       {/* 댓글 카드 */}
       <Card>

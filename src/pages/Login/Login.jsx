@@ -3,7 +3,7 @@ import {
   AuthWrapper, AuthCard, Title, Subtitle, SubmitButton
 } from "../../styles/Auth.styles";
 import InputField from "../../components/Login/InputField";
-import api from "../../api/login/login";
+import * as api from "../../api/login/login";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
