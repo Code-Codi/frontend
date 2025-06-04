@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import axios from 'axios';
+import { favoritePost } from '../../api/board/board';
 
 const Row = styled.tr`
   border-bottom: 1px solid #e6eff5;
@@ -28,9 +28,9 @@ const TitleCell = styled(Cell)`
 
 export default function PostRow({ post, boardType }) {
 
-const handleFavorite = async (postId) => {
+const handleFavorite = async () => {
   try {
-    await axios.post(`/post/${postId}/favorite`);
+    await favoritePost(post.id);  // ← 여기 수정
     window.location.reload();
   } catch (e) {
     console.error('Failed to favorite:', e);
@@ -50,17 +50,19 @@ const handleFavorite = async (postId) => {
       <Cell>{post.createdAt?.slice(0, 10) || '-'}</Cell>
       <Cell>❤️ {post.favorites || 0}
          <button
-          onClick={handleFavorite}
-          style={{
-            marginLeft: '8px',
-            padding: '2px 6px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            cursor: 'pointer',
-            backgroundColor: 'white',
-          }}
-        >
-          ♡</button>
+  onClick={() => handleFavorite(post.id)}  // post.id를 넘겨줘야 함
+  style={{
+    marginLeft: '8px',
+    padding: '2px 6px',
+    borderRadius: '6px',
+    border: '1px solid #ccc',
+    cursor: 'pointer',
+    backgroundColor: 'white',
+  }}
+>
+  ♡
+</button>
+
       </Cell>
     </Row>
   );

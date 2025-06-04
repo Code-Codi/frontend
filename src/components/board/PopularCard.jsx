@@ -41,9 +41,10 @@ const Footer = styled.div`
 `;
 
 export default function PopularCard({ post }) {
+  const baseURL = 'http://localhost:8080';
   const thumbnail =
-    post.thumbnail?.startsWith('http') && post.thumbnail.length > 8
-      ? post.thumbnail
+    post.thumbnail
+      ? `${baseURL}${post.thumbnail}`
       : 'https://placehold.co/320x180?text=thumbnail';
 
   return (
