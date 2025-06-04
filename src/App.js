@@ -11,13 +11,21 @@ import Header from "./components/Header/Header";
 import { createGlobalStyle } from "styled-components";
 
 //게시판
-import DashboardLayout from './pages/post/layouts/DashboardLayout';
-import ShareDetail from './pages/post/share/ShareDetail';
-import ShareList from './pages/post/share/ShareList';
-import ShareWrite from './pages/post/share/ShareWrite';
-import GuideDetail from './pages/post/guide/GuideDetail';
-import GuideList from './pages/post/guide/GuideList';
-import GuideWrite from './pages/post/guide/GuideWrite';
+import DashboardLayout from './layouts/DashboardLayout';
+import ShareDetail from './pages/share/ShareDetail';
+import ShareList from './pages/share/ShareList';
+import ShareWrite from './pages/share/ShareWrite';
+import GuideDetail from './pages/guide/GuideDetail';
+import GuideList from './pages/guide/GuideList';
+import GuideWrite from './pages/guide/GuideWrite';
+
+//로그인
+import Login from './pages/Login/Login'
+import Signup from './pages/Login/Signup'
+import { Navigate } from 'react-router-dom';
+
+
+
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -31,8 +39,15 @@ function App() {
   return (
     <BrowserRouter>
       <GlobalStyle />
+      <Routes>
+        {/* 로그인 */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+
       <Header />
       <Sidebar />
+
       <Routes>
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/meetingList" element={<MeetingList />} />
@@ -44,7 +59,6 @@ function App() {
         <Route path="/project" element={<Project />} />
         <Route path="/project/subProject" element={<Project />} />
 
-
         {/* 게시판 */}
         <Route path="/" element={<DashboardLayout/>}>
 
@@ -55,12 +69,11 @@ function App() {
           <Route path="guide" element={<GuideList/>} />
           <Route path="guide/:postId" element={<GuideDetail/>} />
           <Route path="guide/write" element={<GuideWrite />} />
+
+          {/* 첫화면 */}
+          <Route index element={<Navigate to="login" />} />
           
         </Route>
-        {/* 로그인 */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-
       </Routes>
     </BrowserRouter>
   );
