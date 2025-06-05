@@ -18,6 +18,8 @@ const handleLogin = async () => {
       email,
       password: pw,
     });
+    console.log("로그인 응답 결과:", response);
+
 
     // 응답 구조: { isSuccess, code, message, result }
     if (response.isSuccess) {
@@ -25,7 +27,7 @@ const handleLogin = async () => {
       localStorage.setItem("username", username);
 
       alert("로그인 성공!");
-      navigate("/share"); // 원하는 경로로 이동
+      navigate("/teamProject"); // 원하는 경로로 이동
     } else {
       alert(`로그인 실패: ${response.message}`);
     }
