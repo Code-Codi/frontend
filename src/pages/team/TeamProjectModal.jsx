@@ -7,38 +7,60 @@ export default function TeamProjectModal({ onClose, refreshProjects, editData })
   const [emailInput, setEmailInput] = useState("");
   const [memberList, setMemberList] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  const loggedInUser = {
-    id: 3,
-    email: "prof@codi.com",
-    userName: "김수현",
-  };
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   useEffect(() => {
+    const fetchLoginUser = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/users/me", {
+          withCredentials: true,
+        });
+        setLoggedInUser(res.data.result);
+      } catch (err) {
+        console.error("로그인 사용자 정보 가져오기 실패", err);
+      }
+    };
+
+    fetchLoginUser();
+  }, []);
+
+  useEffect(() => {
+    if (!loggedInUser) return;
+
     if (editData) {
       setTeamName(editData.name);
-      setMemberList(editData.members.map(m => ({
-        email: m.email,
-        name: m.userName
-      })));
+      setMemberList(
+        editData.members.map((m) => ({
+          email: m.email,
+          name: m.username, 
+        }))
+      );
     } else {
-      setMemberList([{ email: loggedInUser.email, name: loggedInUser.userName }]);
+      setTeamName("");
+      setMemberList([
+        {
+          email: loggedInUser.email,
+          name: loggedInUser.username,
+        },
+      ]);
     }
-  }, [editData]);
-  
+  }, [editData, loggedInUser]);
 
   const handleAddMember = () => {
     if (!emailInput.trim()) return;
 
-    axios.get(`http://localhost:8080/users/email/${emailInput}`)
-      .then(res => {
+    axios
+      .get(`http://localhost:8080/users/email/${emailInput}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
         const user = res.data.result;
         const exists = memberList.some((m) => m.email === user.email);
         if (exists) {
           alert("이미 추가된 팀원입니다.");
           return;
         }
-        setMemberList([...memberList, { email: user.email, name: user.userName }]);
+        setMemberList((prev) => [...prev, { email: user.email, name: user.username }]);
         setEmailInput("");
       })
       .catch(() => {
@@ -60,12 +82,16 @@ export default function TeamProjectModal({ onClose, refreshProjects, editData })
     };
 
     const api = editData
-      ? axios.patch(`http://localhost:8080/teamProject/${editData.id}`, payload)
-      : axios.post("http://localhost:8080/teamProject", payload);
+      ? axios.patch(`http://localhost:8080/teamProject/${editData.id}`, payload, {
+          withCredentials: true,
+        })
+      : axios.post("http://localhost:8080/teamProject", payload, {
+          withCredentials: true,
+        });
 
     api
       .then(() => setShowSuccess(true))
-      .catch(err => {
+      .catch((err) => {
         alert("팀 저장 실패");
         console.error(err);
       });
@@ -82,7 +108,9 @@ export default function TeamProjectModal({ onClose, refreshProjects, editData })
       <div className="task-modal">
         <div className="modal-header">
           <h3>{editData ? "팀 수정" : "새 팀 프로젝트 생성"}</h3>
-          <button className="edit-toggle-btn" onClick={onClose}>✕</button>
+          <button className="edit-toggle-btn" onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <label>
@@ -100,7 +128,9 @@ export default function TeamProjectModal({ onClose, refreshProjects, editData })
               onChange={(e) => setEmailInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddMember()}
             />
-            <button className="email-add-btn" onClick={handleAddMember}>추가</button>
+            <button className="email-add-btn" onClick={handleAddMember}>
+              추가
+            </button>
           </div>
         </label>
 
@@ -108,18 +138,15 @@ export default function TeamProjectModal({ onClose, refreshProjects, editData })
           {memberList.map((m, idx) => (
             <li key={idx}>
               {m.name} ({m.email})
-                <button
-                  className="remove-member-btn"
-                  onClick={() => {
-                  setMemberList(prev => prev.filter((_, i) => i !== idx));
-                }}
-                 >
-                  ✕
-                </button>
+              <button
+                className="remove-member-btn"
+                onClick={() => setMemberList((prev) => prev.filter((_, i) => i !== idx))}
+              >
+                ✕
+              </button>
             </li>
-            ))}
+          ))}
         </ul>
-
 
         <div className="task-modal-actions">
           <button onClick={onClose}>취소</button>

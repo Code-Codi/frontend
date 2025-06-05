@@ -8,17 +8,22 @@ import TeamProjectModal from './TeamProjectModal';
 export default function TeamProject() {
   const [showModal, setShowModal] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [userId, setUserId] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [teamToLeave, setTeamToLeave] = useState(null);
   const [highlightTeamId, setHighlightTeamId] = useState(null);
   const navigate = useNavigate();
 
-  const userId = 3;
+  const fetchProjects = async (uid) => {
+    if (!uid) {
+      console.warn("userId가 없습니다. fetchProjects 중단");
+      return [];
+    }
 
-  const fetchProjects = async () => {
+    console.log("📥 fetchProjects() called with uid:", uid);
     try {
-      const res = await axios.get(`http://localhost:8080/teamProject/my/${userId}`);
+      const res = await axios.get(`http://localhost:8080/teamProject/my/${uid}`);
       const teamList = res.data.result;
 
       const teamsWithMembers = await Promise.all(
@@ -27,7 +32,7 @@ export default function TeamProject() {
             const memberRes = await axios.get(`http://localhost:8080/teamProject/${team.id}/members`);
             return { ...team, members: memberRes.data.result };
           } catch (err) {
-            console.error(`팀 ID ${team.id}의 멤버 조회 실패`, err);
+            console.error(`❌ 팀 ${team.id} 멤버 조회 실패`, err);
             return { ...team, members: [] };
           }
         })
@@ -41,21 +46,37 @@ export default function TeamProject() {
   };
 
   const handleLeave = () => {
-    axios.delete(`http://localhost:8080/teamProject/${teamToLeave}/member/${userId}`)
+    axios
+      .delete(`http://localhost:8080/teamProject/${teamToLeave}/member/${userId}`)
       .then(() => {
         setShowLeaveConfirm(false);
         setTeamToLeave(null);
         handleRefresh();
       })
-      .catch(err => {
+      .catch((err) => {
         alert("팀 나가기 실패");
         console.error(err);
       });
   };
 
   useEffect(() => {
-    // 초기 로딩 시
-    fetchProjects().then(setProjects);
+    const fetchUserAndProjects = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/users/me", {
+          withCredentials: true,
+        });
+        const loginUser = res.data.result;
+        console.log("👤 로그인된 사용자:", loginUser);
+        setUserId(loginUser.id);
+
+        const projectList = await fetchProjects(loginUser.id);
+        setProjects(projectList);
+      } catch (err) {
+        console.error("로그인 사용자 정보 또는 팀 목록 가져오기 실패", err);
+      }
+    };
+
+    fetchUserAndProjects();
   }, []);
 
   useEffect(() => {
@@ -69,15 +90,20 @@ export default function TeamProject() {
     setShowModal(false);
     setEditTarget(null);
   };
+
   const handleRefresh = async () => {
-    const prevIds = projects.map(p => p.id);
-    const updatedProjects = await fetchProjects();
-  
-    const newTeam = updatedProjects.find(p => !prevIds.includes(p.id));
-  
+    console.log("🔁 handleRefresh 호출됨");
+    console.log("userId 상태:", userId);
+    if (!userId) return;
+
+    const prevIds = projects.map((p) => p.id);
+    const updatedProjects = await fetchProjects(userId);
+
+    const newTeam = updatedProjects.find((p) => !prevIds.includes(p.id));
+
     if (newTeam) {
       const sortedProjects = [
-        ...updatedProjects.filter(p => p.id !== newTeam.id),
+        ...updatedProjects.filter((p) => p.id !== newTeam.id),
         newTeam,
       ];
       setProjects(sortedProjects);
@@ -89,9 +115,6 @@ export default function TeamProject() {
       setProjects(updatedProjects);
     }
   };
-  
-  
-  
 
   return (
     <div className="team-project-container">
