@@ -11,15 +11,12 @@ export default function CommentRow({ comment, onDelete }) {
         {comment.createdAt?.slice(0, 10)}
       </td>
       <td>
-        ❤️ {comment.favorites || 0}
-        {comment.writerId === currentUserId && (
           <button
             onClick={() => onDelete(comment.id)}
             style={{ marginLeft: '8px' }}
           >
             삭제
           </button>
-        )}
       </td>
     </tr>
   );

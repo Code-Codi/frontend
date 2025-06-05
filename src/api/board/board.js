@@ -32,3 +32,7 @@ export const deletePost = (postId) => {
 export const deleteComment = (commentId, postId) => {
   return axios.delete(`${BASE_URL}/${postId}/comments/${commentId}`);
 };
+
+// 좋아요 증가
+export const favoritePost = (postId) =>
+  axios.post(`${BASE_URL}/${postId}/favorite`);

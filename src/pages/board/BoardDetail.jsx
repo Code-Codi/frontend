@@ -189,7 +189,7 @@ const handleDeleteComment = async (commentId) => {
               <th style={{ width: '20%' }}>Name</th>
               <th>Content</th>
               <th style={{ width: '20%' }}>Date</th>
-              <th style={{ width: '10%' }}>Favorites</th>
+              <th style={{ width: '10%' }}>Delete</th>
             </tr>
           </thead>
           <tbody>
