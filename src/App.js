@@ -7,7 +7,7 @@ import MeetingDetail from "./pages/meeting/MeetingDetailForm";
 import TaskList from "./pages/task/TaskList";
 import TaskDetail from "./pages/task/TaskDetailForm";
 import Project from "./pages/project/Project";
-import TeamProject from "./pages/team/TeamProject";
+import TeamProject from "./pages/team/teamProject";
 
 import Sidebar from "./components/sidebar/Sidebar";
 import Header from "./components/Header/Header";

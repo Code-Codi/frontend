@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Pencil, Trash2 } from 'lucide-react';
-import './TeamProject.scss';
+import './teamProject.scss';
 import TeamProjectModal from './TeamProjectModal';
 
 export default function TeamProject() {
