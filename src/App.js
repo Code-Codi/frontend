@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
 
 import Schedule from "./pages/schedule/Schedule";
@@ -10,20 +16,20 @@ import Project from "./pages/project/Project";
 import TeamProject from "./pages/team/teamProject";
 
 import Sidebar from "./components/sidebar/Sidebar";
-import Header from "./components/Header/Header";
+import Header from "./components/header/Header";
 
 // 게시판
-import DashboardLayout from './layouts/DashboardLayout';
-import ShareDetail from './pages/share/ShareDetail';
-import ShareList from './pages/share/ShareList';
-import ShareWrite from './pages/share/ShareWrite';
-import GuideDetail from './pages/guide/GuideDetail';
-import GuideList from './pages/guide/GuideList';
-import GuideWrite from './pages/guide/GuideWrite';
+import DashboardLayout from "./layouts/DashboardLayout";
+import ShareDetail from "./pages/share/ShareDetail";
+import ShareList from "./pages/share/ShareList";
+import ShareWrite from "./pages/share/ShareWrite";
+import GuideDetail from "./pages/guide/GuideDetail";
+import GuideList from "./pages/guide/GuideList";
+import GuideWrite from "./pages/guide/GuideWrite";
 
 // 로그인
-import Login from './pages/Login/Login';
-import Signup from './pages/Login/Signup';
+import Login from "./pages/Login/Login";
+import Signup from "./pages/Login/Signup";
 
 import LayoutWithoutSidebar from "./LayoutWithoutSidebar";
 
@@ -67,7 +73,10 @@ function AppRoutes() {
           <Routes>
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/meetingList" element={<MeetingList />} />
-            <Route path="/meetingDetail/:meetingId" element={<MeetingDetail />} />
+            <Route
+              path="/meetingDetail/:meetingId"
+              element={<MeetingDetail />}
+            />
             <Route path="/meetingCreate" element={<MeetingDetail />} />
             <Route path="/taskList" element={<TaskList />} />
             <Route path="/taskDetail/:taskId" element={<TaskDetail />} />
