@@ -121,7 +121,7 @@ export default function MeetingTable() {
 
 
     const handleCreateMeeting = () => {
-        navigate("/meetingCreate");
+        navigate(`/meetingCreate?teamId=${teamId}`);
     };
 
     return (
@@ -142,19 +142,21 @@ export default function MeetingTable() {
                 </tr>
                 </thead>
                 <tbody>
-                {meetings.map((item, idx) => (
-                    <TableRow key={item.id} onClick={() => goToDetail(item.id)}>
-                        <Td>{page * 10 + idx + 1}</Td>
-                        <Td>{item.dateTime?.split("T")[0]}</Td>
-                        <Td>{item.title}</Td>
-                        <Td>-</Td> {/* or item.members if available */}
-                        <Td>{item.location}</Td>
-                    </TableRow>
-                ))}
+                {meetings.map((item, idx) => {
+                    return (
+                        <TableRow key={item.id} onClick={() => goToDetail(item.id)}>
+                            <Td>{page * 10 + idx + 1}</Td>
+                            <Td>{item.dateTime?.split("T")[0]}</Td>
+                            <Td>{item.title}</Td>
+                            <Td>-</Td>
+                            <Td>{item.location}</Td>
+                        </TableRow>
+                    );
+                })}
                 </tbody>
             </Table>
             <Pagination>
-                {Array.from({ length: totalPages }, (_, i) => (
+                {Array.from({length: totalPages}, (_, i) => (
                     <PageButton key={i} active={i === page} onClick={() => fetchMeetings(i)}>
                         {i + 1}
                     </PageButton>

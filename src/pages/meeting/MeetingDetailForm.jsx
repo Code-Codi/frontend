@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { useParams, useLocation, useNavigate} from 'react-router-dom';
+import { useParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import AgendaSection from '../../components/meeting/AgendaSection';
 import DecisionSection from '../../components/meeting/DecisionSection';
@@ -127,6 +127,8 @@ export default function MeetingDetailForm() {
     const { meetingId } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const teamId = searchParams.get("teamId");
 
     const isCreateMode = location.pathname === '/meetingCreate';
     const [editing, setEditing] = useState(isCreateMode);
@@ -138,7 +140,7 @@ export default function MeetingDetailForm() {
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
 
-    const [agendas, setAgendas] = useState([{ title: '', details: [''] }]);
+    const [agendas, setAgendas] = useState([{ title: '', details: [{ content: '' }] }]);
     const [decisions, setDecisions] = useState(['']);
 
     const [deletedAgendaDetailIds, setDeletedAgendaDetailIds] = useState([]);
@@ -147,16 +149,34 @@ export default function MeetingDetailForm() {
 
     const participantOptions = ['ALL', '세미', '수현', '민경', '세령'];
     const handleCreate = async () => {
+        console.log("➡️ [handleCreate] 호출됨");
+        console.log("📌 teamId:", teamId);
+        console.log("📌 title:", title);
+        console.log("📌 date:", date);
+        console.log("📌 locationName:", locationName);
+
         try {
+            if (!teamId) {
+                alert("팀 정보가 없습니다. 회의록을 생성할 수 없습니다.");
+                return;
+            }
+
             const formattedDateTime = `${date}T00:00:00`;
 
-            const res = await axios.post('http://localhost:8080/meeting', {
-                teamId: 1,
+            console.log("📤 POST 요청 보낼 데이터:", {
+                teamId: parseInt(teamId),
                 title,
                 dateTime: formattedDateTime,
                 location: locationName
             });
 
+            const res = await axios.post('http://localhost:8080/meeting', {
+                teamId: parseInt(teamId),
+                title,
+                dateTime: formattedDateTime,
+                location: locationName
+            });
+            console.log("POST /meeting 응답:", res);
             const meetingId = res.data.result;
 
             for (const agenda of agendas) {
@@ -170,7 +190,7 @@ export default function MeetingDetailForm() {
                 for (const detail of agenda.details) {
                     await axios.post('http://localhost:8080/meeting/item/agenda-detail', {
                         agendaId,
-                        content: detail
+                        content: detail.content
                     });
                 }
             }
@@ -178,7 +198,7 @@ export default function MeetingDetailForm() {
             for (const content of decisions) {
                 await axios.post('http://localhost:8080/meeting/item/decision', {
                     meetingId,
-                    content
+                    content: content.content
                 });
             }
 
@@ -282,6 +302,8 @@ export default function MeetingDetailForm() {
 
     useEffect(() => {
         const fetchMeeting = async () => {
+            if (!meetingId) return;
+
             try {
                 const res = await axios.get(`http://localhost:8080/meeting/${meetingId}`);
                 const data = res.data.result;
@@ -315,6 +337,11 @@ export default function MeetingDetailForm() {
         if (meetingId) fetchMeeting();
     }, [meetingId]);
 
+    useEffect(() => {
+        if (!isCreateMode && meetingId) {
+            setEditing(false); // 등록 후 조회 전환 확실하게
+        }
+    }, [isCreateMode, meetingId]);
 
     const handleToggleSelect = (value) => {
         if (value === 'ALL') {
