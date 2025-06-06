@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { LocalDate, LocalDateTime } from "js-joda";
+import { useLocation } from "react-router-dom";
 import ScheduleListModal from "../../components/schedule/modal/ScheduleListModal";
 import ScheduleCreateModal from "../../components/schedule/modal/ScheduleCreateModal";
 import ScheduleDeleteModal from "../../components/schedule/modal/ScheduleDeleteModal";
@@ -107,6 +108,9 @@ const Schedule = () => {
 
   const firstCellRef = useRef(null);
 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const teamId = queryParams.get("teamId");
   const currentYear = currentDate.getFullYear();
 
   const updateCellWidth = () => {
@@ -121,7 +125,11 @@ const Schedule = () => {
   useEffect(() => {
     const fetchScheduleData = async () => {
       try {
-        const data = await getSchedule(currentYear, currentDate.getMonth() + 1);
+        const data = await getSchedule(
+          teamId,
+          currentYear,
+          currentDate.getMonth() + 1
+        );
 
         setScheduleData(data.result); // 데이터만 세팅
       } catch (error) {
@@ -277,7 +285,11 @@ const Schedule = () => {
 
   const updateScheduleData = async () => {
     try {
-      const data = await getSchedule(currentYear, currentDate.getMonth() + 1);
+      const data = await getSchedule(
+        teamId,
+        currentYear,
+        currentDate.getMonth() + 1
+      );
       setScheduleData(data.result);
     } catch (error) {}
   };

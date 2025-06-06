@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { LocalDateTime, DateTimeFormatter } from "js-joda";
+import { LocalDateTime } from "js-joda";
 
 const Overlay = styled.div`
   position: fixed;
