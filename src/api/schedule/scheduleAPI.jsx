@@ -9,10 +9,10 @@ export const createSchedule = async (scheduleData) => {
   }
 };
 
-export const getSchedule = async (year, month) => {
+export const getSchedule = async (teamId, year, month) => {
   try {
     const response = await axios.get(
-      `/api/schedules?year=${year}&month=${month}`
+      `/api/schedules/team/${teamId}?year=${year}&month=${month}`
     );
     return response.data;
   } catch (error) {

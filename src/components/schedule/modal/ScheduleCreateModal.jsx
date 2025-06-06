@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
 import {
   createSchedule,
   updateSchedule,
@@ -144,7 +145,9 @@ const ScheduleCreateModal = ({
   schedule,
   onSaveSuccess,
 }) => {
-  const [teamId, setTeamId] = useState(1); // 임시 설정ㅇ
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const teamId = queryParams.get("teamId");
   const [title, setTitle] = useState("");
 
   const [startDate, setStartDate] = useState("");
@@ -179,7 +182,6 @@ const ScheduleCreateModal = ({
       setEndTime(end.toISOString().slice(11, 16));
       setEndLocalDateTime(schedule.endDate);
       setContent(schedule.content || "");
-      setTeamId(schedule.teamId || 1);
     } else if (mode === "create" && selectedDate) {
       const formattedDate = formatLocalDateTimeToDateString(selectedDate);
       setStartDate(formattedDate);
@@ -241,7 +243,7 @@ const ScheduleCreateModal = ({
     }
 
     const scheduleData = {
-      teamId: teamId, // 임시 설정
+      teamId: teamId,
       title: title,
       startDate: startLocalDateTime,
       endDate: endLocalDateTime,
