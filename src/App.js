@@ -16,7 +16,7 @@ import Project from "./pages/project/Project";
 import TeamProject from "./pages/team/teamProject";
 
 import Sidebar from "./components/sidebar/Sidebar";
-import Header from "./components/header/Header";
+import Header from "./components/Header/Header";
 
 // 게시판
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -94,7 +94,7 @@ function AppRoutes() {
               <Route path="guide/:postId" element={<GuideDetail />} />
               <Route path="guide/write" element={<GuideWrite />} />
 
-              <Route index element={<Navigate to="/teamProject" />} />
+              <Route index element={<Navigate to="/login" />} />
             </Route>
           </Routes>
         </LayoutWithSidebar>

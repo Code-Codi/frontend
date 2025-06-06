@@ -26,8 +26,8 @@ const handleLogin = async () => {
       const username = response.result.username;
       localStorage.setItem("username", username);
 
-      alert("로그인 성공!");
-      navigate("/teamProject"); // 원하는 경로로 이동
+      // alert("로그인 성공!");
+      navigate("/share"); // 원하는 경로로 이동
     } else {
       alert(`로그인 실패: ${response.message}`);
     }
