@@ -16,7 +16,7 @@ import Project from "./pages/project/Project";
 import TeamProject from "./pages/team/teamProject";
 
 import Sidebar from "./components/sidebar/Sidebar";
-import Header from "./components/Header/Header";
+import Header from "./components/header/Header";
 
 // 게시판
 import DashboardLayout from "./layouts/DashboardLayout";
