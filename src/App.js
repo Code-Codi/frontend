@@ -94,7 +94,7 @@ function AppRoutes() {
               <Route path="guide/:postId" element={<GuideDetail />} />
               <Route path="guide/write" element={<GuideWrite />} />
 
-              <Route index element={<Navigate to="/teamProject" />} />
+              <Route index element={<Navigate to="/login" />} />
             </Route>
           </Routes>
         </LayoutWithSidebar>
