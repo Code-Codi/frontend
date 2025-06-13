@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 
@@ -87,13 +87,21 @@ const dummyData = [
 
 export default function MeetingTable() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const teamId = searchParams.get("teamId");
+
     const [meetings, setMeetings] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     const fetchMeetings = async (pageNum = 0) => {
+        if (!teamId) {
+            console.warn("teamId가 없습니다. 로그인 또는 팀 선택 후 이용하세요.");
+            return;
+        }
+
         try {
-            const res = await axios.get(`http://localhost:8080/meeting?page=${pageNum}&size=10`);
+            const res = await axios.get(`http://localhost:8080/meeting?teamId=${teamId}&page=${pageNum}&size=10`);
             setMeetings(res.data.result.content);
             setPage(res.data.result.number);
             setTotalPages(res.data.result.totalPages);
@@ -104,7 +112,7 @@ export default function MeetingTable() {
 
     useEffect(() => {
         fetchMeetings(0);
-    }, []);
+    }, [teamId]);
 
 
     const goToDetail = (id) => {
@@ -113,7 +121,7 @@ export default function MeetingTable() {
 
 
     const handleCreateMeeting = () => {
-        navigate("/meetingCreate");
+        navigate(`/meetingCreate?teamId=${teamId}`);
     };
 
     return (
@@ -134,19 +142,21 @@ export default function MeetingTable() {
                 </tr>
                 </thead>
                 <tbody>
-                {meetings.map((item, idx) => (
-                    <TableRow key={item.id} onClick={() => goToDetail(item.id)}>
-                        <Td>{page * 10 + idx + 1}</Td>
-                        <Td>{item.dateTime?.split("T")[0]}</Td>
-                        <Td>{item.title}</Td>
-                        <Td>-</Td> {/* or item.members if available */}
-                        <Td>{item.location}</Td>
-                    </TableRow>
-                ))}
+                {meetings.map((item, idx) => {
+                    return (
+                        <TableRow key={item.id} onClick={() => goToDetail(item.id)}>
+                            <Td>{page * 10 + idx + 1}</Td>
+                            <Td>{item.dateTime?.split("T")[0]}</Td>
+                            <Td>{item.title}</Td>
+                            <Td>-</Td>
+                            <Td>{item.location}</Td>
+                        </TableRow>
+                    );
+                })}
                 </tbody>
             </Table>
             <Pagination>
-                {Array.from({ length: totalPages }, (_, i) => (
+                {Array.from({length: totalPages}, (_, i) => (
                     <PageButton key={i} active={i === page} onClick={() => fetchMeetings(i)}>
                         {i + 1}
                     </PageButton>
