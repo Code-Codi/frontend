@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Table = styled.table`
   width: 100%;
@@ -88,10 +88,12 @@ export default function TaskTable() {
     const [tasks, setTasks] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
+    const [searchParams] = useSearchParams();
+    const teamId = searchParams.get("teamId");
 
     const fetchTasks = async (pageNum = 0) => {
         try {
-            const res = await axios.get(`http://localhost:8080/tasks?page=${pageNum}&size=10`);
+            const res = await axios.get(`http://localhost:8080/tasks?teamId=${teamId}&page=${pageNum}&size=10`);
             setTasks(res.data.content);
             setPage(res.data.number);
             setTotalPages(res.data.totalPages);
@@ -102,7 +104,7 @@ export default function TaskTable() {
 
     useEffect(() => {
         fetchTasks(0);
-    }, []);
+    }, [teamId]);
 
     const handleSubmit = (task) => {
         if (window.confirm("과제를 제출하시겠습니까?")) {
@@ -115,7 +117,7 @@ export default function TaskTable() {
     };
 
     const handleCreateTask = () => {
-        navigate("/taskCreate");
+        navigate(`/taskCreate?teamId=${teamId}`);
     };
 
     return (
