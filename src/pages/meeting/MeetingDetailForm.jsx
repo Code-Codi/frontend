@@ -278,6 +278,8 @@ export default function MeetingDetailForm() {
 
             alert("회의록이 성공적으로 수정되었습니다!");
             setEditing(false);
+            navigate(`/meetingDetail/${meetingId}`);
+
         } catch (error) {
             console.error("수정 중 오류:", error);
             alert("회의록 수정에 실패했습니다.");
