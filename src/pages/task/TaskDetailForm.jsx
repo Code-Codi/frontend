@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import {useParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import {useParams, useLocation, useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
     display: flex;
@@ -156,8 +156,7 @@ const DeleteIcon = styled.div`
 `;
 
 export default function TaskDetailForm() {
-    const [searchParams] = useSearchParams();
-    const teamId = searchParams.get("teamId");
+    const teamId = localStorage.getItem("teamId");
 
     const { taskId } = useParams();
     const [title, setTitle] = useState('');
@@ -272,7 +271,7 @@ export default function TaskDetailForm() {
         try {
             await axios.delete(`http://localhost:8080/tasks/${taskId}`);
             alert("과제가 삭제되었습니다.");
-            navigate("/taskList?teamId=${teamId}"); // 삭제 후 목록으로 이동
+            navigate("/taskList"); // 삭제 후 목록으로 이동
         } catch (error) {
             console.error("과제 삭제 실패:", error);
             alert("과제 삭제에 실패했습니다.");

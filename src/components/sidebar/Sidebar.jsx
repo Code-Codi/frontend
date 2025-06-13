@@ -86,7 +86,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
-  const teamId = queryParams.get("teamId");
+  const teamId = localStorage.getItem("teamId");
 
   const handleItemClick = (index, path) => {
     setActiveIndex(index);

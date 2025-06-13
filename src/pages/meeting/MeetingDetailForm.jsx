@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { useParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AgendaSection from '../../components/meeting/AgendaSection';
 import DecisionSection from '../../components/meeting/DecisionSection';
@@ -127,8 +127,7 @@ export default function MeetingDetailForm() {
     const { meetingId } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const teamId = searchParams.get("teamId");
+    const teamId = localStorage.getItem("teamId");
 
     const isCreateMode = location.pathname === '/meetingCreate';
     const [editing, setEditing] = useState(isCreateMode);

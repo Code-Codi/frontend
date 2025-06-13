@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 
@@ -87,8 +87,7 @@ const dummyData = [
 
 export default function MeetingTable() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const teamId = searchParams.get("teamId");
+    const teamId = localStorage.getItem("teamId");
 
     const [meetings, setMeetings] = useState([]);
     const [page, setPage] = useState(0);
@@ -121,7 +120,7 @@ export default function MeetingTable() {
 
 
     const handleCreateMeeting = () => {
-        navigate(`/meetingCreate?teamId=${teamId}`);
+        navigate(`/meetingCreate`);
     };
 
     return (

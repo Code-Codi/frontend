@@ -150,7 +150,10 @@ export default function TeamProject() {
             </div>
             <div
               className="card-content"
-              onClick={() => navigate(`/project?teamId=${project.id}`)}
+              onClick={() => {
+                localStorage.setItem("teamId", project.id);
+                navigate(`/project?teamId=${project.id}`);
+              }}
             >
               <p className="project-title">{project.name}</p>
               <div className="project-members">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Table = styled.table`
   width: 100%;
@@ -88,9 +88,7 @@ export default function TaskTable() {
     const [tasks, setTasks] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [searchParams] = useSearchParams();
-    const teamId = searchParams.get("teamId");
-
+    const teamId = localStorage.getItem("teamId");
     const fetchTasks = async (pageNum = 0) => {
         try {
             const res = await axios.get(`http://localhost:8080/tasks?teamId=${teamId}&page=${pageNum}&size=10`);
@@ -117,7 +115,7 @@ export default function TaskTable() {
     };
 
     const handleCreateTask = () => {
-        navigate(`/taskCreate?teamId=${teamId}`);
+        navigate(`/taskCreate`);
     };
 
     return (
