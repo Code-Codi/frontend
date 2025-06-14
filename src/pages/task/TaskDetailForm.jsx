@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import {useParams, useLocation, useNavigate} from 'react-router-dom';
+import {useParams, useLocation, useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
     display: flex;
@@ -156,6 +156,8 @@ const DeleteIcon = styled.div`
 `;
 
 export default function TaskDetailForm() {
+    const teamId = localStorage.getItem("teamId");
+
     const { taskId } = useParams();
     const [title, setTitle] = useState('');
     const [participants, setParticipants] = useState([]);
@@ -204,7 +206,7 @@ export default function TaskDetailForm() {
         try {
             // 1. Task 생성
             const taskResponse = await axios.post("http://localhost:8080/tasks", {
-                teamId: 1,
+                teamId: parseInt(teamId),
                 title: title,
                 status: "IN_PROGRESS",
                 taskDate: new Date().toISOString().slice(0, 10), // yyyy-MM-dd 형식
@@ -394,7 +396,7 @@ export default function TaskDetailForm() {
                         <ActionButton onClick={() => setEditing(true)}>수정</ActionButton>
                     ) : (
                         <>
-                            <DeleteButton onClick={handleDeleteTask}>삭제</DeleteButton>
+                            <DeleteButton onClick={handleDeleteTask}>전체 삭제</DeleteButton>
                             <ActionButton onClick={handleUpdate}>저장</ActionButton>
 
                         </>

@@ -88,10 +88,10 @@ export default function TaskTable() {
     const [tasks, setTasks] = useState([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-
+    const teamId = localStorage.getItem("teamId");
     const fetchTasks = async (pageNum = 0) => {
         try {
-            const res = await axios.get(`http://localhost:8080/tasks?page=${pageNum}&size=10`);
+            const res = await axios.get(`http://localhost:8080/tasks?teamId=${teamId}&page=${pageNum}&size=10`);
             setTasks(res.data.content);
             setPage(res.data.number);
             setTotalPages(res.data.totalPages);
@@ -102,7 +102,7 @@ export default function TaskTable() {
 
     useEffect(() => {
         fetchTasks(0);
-    }, []);
+    }, [teamId]);
 
     const handleSubmit = (task) => {
         if (window.confirm("과제를 제출하시겠습니까?")) {
@@ -115,7 +115,7 @@ export default function TaskTable() {
     };
 
     const handleCreateTask = () => {
-        navigate("/taskCreate");
+        navigate(`/taskCreate`);
     };
 
     return (
