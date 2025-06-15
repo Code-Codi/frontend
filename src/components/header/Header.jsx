@@ -119,9 +119,8 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const userId = localStorage.getItem("userId");
+  const role = localStorage.getItem("role");
   const navigate = useNavigate();
-  const role = "STUDENT";
-
   const dropDownRef = useRef(null);
 
   const fetchProjects = async () => {
@@ -149,7 +148,6 @@ export default function Header() {
           }
         })
       );
-
       return teamsWithMembers;
     } catch (err) {
       console.error("내 팀 목록 가져오기 실패", err);
@@ -157,17 +155,28 @@ export default function Header() {
     }
   };
 
+  const fetchCourses = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/courses", {
+        withCredentials: true,
+      });
+      console.log(res.data.result);
+      return res.data.result;
+    } catch (err) {
+      console.error("강의 리스트 가져오기 실패", err);
+    }
+  };
+
   useEffect(() => {
     if (open && userId) {
       (async () => {
+        const res = null;
         if (role === "STUDENT") {
           const res = await fetchProjects();
           setItems(res);
         } else if (role === "PROFESSOR") {
-          setItems([
-            { id: 1, name: "Class A" },
-            { id: 2, name: "Class B" },
-          ]);
+          const res = await fetchCourses();
+          setItems(res);
         }
       })();
     }
@@ -214,8 +223,8 @@ export default function Header() {
                     <li
                       key={item.id}
                       onClick={() => {
-                        localStorage.setItem("teamId", item.id);
                         if (role === "STUDENT") {
+                          localStorage.setItem("teamId", item.id);
                           navigate(`/project?teamId=${item.id}`);
                         } else if (role === "PROFESSOR") {
                           //navigate(`/class?classId=${item.id}`);
