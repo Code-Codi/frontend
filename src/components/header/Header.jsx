@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { ReactComponent as AccountSVG } from "../../assets/account.svg";
-import { ReactComponent as DropDownIcon } from "../../assets/dropDown.svg";
+import { ReactComponent as ArrowDown } from "../../assets/arrowDown.svg";
+import { ReactComponent as ArrowUp } from "../../assets/arrowUp.svg";
 import { ReactComponent as TaskIcon } from "../../assets/task.svg";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +46,7 @@ const Logo = styled.div`
   font-weight: bold;
 `;
 
-const StyledDropDown = styled(DropDownIcon)`
+const StyledDropDown = styled(ArrowDown)`
   width: 30px;
   height: 30px;
   fill: #343c6a;
