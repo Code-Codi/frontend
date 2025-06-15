@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -8,7 +8,6 @@ import { ReactComponent as ProjectIcon } from "../../assets/project.svg";
 import { ReactComponent as MeetingIcon } from "../../assets/meeting.svg";
 import { ReactComponent as CalendarIcon } from "../../assets/calendar.svg";
 import { ReactComponent as TaskIcon } from "../../assets/task.svg";
-import { ReactComponent as ShareIcon } from "../../assets/share.svg";
 
 const SidebarContainer = styled.div`
   width: 248px;
@@ -69,28 +68,26 @@ const ColoredIconBox = styled.div`
   }
 `;
 
-// 사이드바 항목 정의
 const items = [
   { label: "홈", icon: HomeIcon, path: "/share" },
-  { label: "가이드라인", icon: GuidelineIcon, pacth: "/guide"},
+  { label: "가이드라인", icon: GuidelineIcon, path: "/guide" },
   { label: "프로젝트", icon: ProjectIcon, path: "/project" },
   { label: "캘린더", icon: CalendarIcon, path: "/schedule" },
   { label: "회의록", icon: MeetingIcon, path: "/meetingList" },
   { label: "과제", icon: TaskIcon, path: "/taskList" },
-  { label: "공유", icon: ShareIcon, path: "/share" },
 ];
 
 const Sidebar = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-
-  const queryParams = new URLSearchParams(location.search);
   const teamId = localStorage.getItem("teamId");
 
-  const handleItemClick = (index, path) => {
-    setActiveIndex(index);
+  const getActiveIndex = () =>
+    items.findIndex((item) => location.pathname.startsWith(item.path));
 
+  const activeIndex = getActiveIndex();
+
+  const handleItemClick = (path) => {
     if (path) {
       if (teamId) {
         navigate(`${path}?teamId=${teamId}`);
@@ -111,7 +108,7 @@ const Sidebar = () => {
           return (
             <SidebarItemContainer
               key={index}
-              onClick={() => handleItemClick(index, item.path)}
+              onClick={() => handleItemClick(item.path)}
             >
               <ColoredIconBox active={isActive}>
                 <Icon />

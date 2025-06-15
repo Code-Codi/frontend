@@ -26,20 +26,19 @@ const Login = () => {
 
       // 응답 구조: { isSuccess, code, message, result }
       if (response.isSuccess) {
-        const username = response.result.username;
-        const id = response.result.id;
+        localStorage.setItem("userId", response.result.id);
+        localStorage.setItem("username", response.result.username);
+        localStorage.setItem("email", response.result.email);
+        localStorage.setItem("role", response.result.role);
 
-        localStorage.setItem("userId", id);
-        localStorage.setItem("username", username);
-
-        // alert("로그인 성공!");
-        navigate("/teamProject"); // 원하는 경로로 이동
-      } else {
-        alert(`로그인 실패: ${response.message}`);
+        if (response.result.role == "STUDENT") {
+          navigate("/teamProject");
+        } else if (response.result.role == "PROFESSOR") {
+          navigate("/taskList"); // 임시 설정
+        }
       }
     } catch (err) {
       console.error("로그인 요청 에러:", err);
-      alert("로그인 실패");
     }
   };
 
