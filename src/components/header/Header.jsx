@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { ReactComponent as AccountSVG } from "../../assets/account.svg";
+import { ReactComponent as LogoutSVG } from "../../assets/logout.svg";
 import { ReactComponent as ArrowDown } from "../../assets/arrowDown.svg";
 import { ReactComponent as ArrowUp } from "../../assets/arrowUp.svg";
 import { ReactComponent as TaskIcon } from "../../assets/task.svg";
 import React, { useState, useEffect, useRef } from "react";
+import { LogoutModal } from "./LogoutModal";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -18,11 +19,10 @@ const HeaderWrapper = styled.div`
   z-index: 1000;
 `;
 
-const AccountIcon = styled(AccountSVG)`
+const LogoutIcon = styled(LogoutSVG)`
   width: 30px;
   height: 30px;
   position: absolute;
-  fill: #718ebf;
   cursor: pointer;
   top: 25px;
   right: 40px;
@@ -118,6 +118,7 @@ const Menu = styled.div`
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
+  const [openLogout, setOpenLogout] = useState(false);
   const userId = localStorage.getItem("userId");
   const role = localStorage.getItem("role");
   const navigate = useNavigate();
@@ -170,7 +171,6 @@ export default function Header() {
   useEffect(() => {
     if (open && userId) {
       (async () => {
-        const res = null;
         if (role === "STUDENT") {
           const res = await fetchProjects();
           setItems(res);
@@ -202,46 +202,55 @@ export default function Header() {
 
   return (
     <HeaderWrapper>
-      <AccountIcon />
+      {userId && <LogoutIcon onClick={() => setOpenLogout(true)} />}
       <LogoContainer>
         <Logo>CODI</Logo>
-        <DropDownWrapper ref={dropDownRef}>
-          <StyledDropDown onClick={() => setOpen((prev) => !prev)} />
-          {open && (
-            <Menu>
-              <TitleWrapper>
-                <TitleText>
-                  {role === "STUDENT" ? "내 워크스페이스" : "내 수업"}
-                </TitleText>
-                {role === "STUDENT" && (
-                  <StyledTaskIcon onClick={() => navigate("/teamProject")} />
-                )}
-              </TitleWrapper>
-              <ul>
-                {items.length > 0 ? (
-                  items.map((item) => (
-                    <li
-                      key={item.id}
-                      onClick={() => {
-                        if (role === "STUDENT") {
-                          localStorage.setItem("teamId", item.id);
-                          navigate(`/project?teamId=${item.id}`);
-                        } else if (role === "PROFESSOR") {
-                          //navigate(`/class?classId=${item.id}`);
-                        }
-                        setOpen(false);
-                      }}
-                    >
-                      {item.name}
-                    </li>
-                  ))
-                ) : (
-                  <li>목록이 없습니다</li>
-                )}
-              </ul>
-            </Menu>
-          )}
-        </DropDownWrapper>
+        {userId && (
+          <DropDownWrapper ref={dropDownRef}>
+            {open ? (
+              <StyledDropDown as={ArrowUp} onClick={() => setOpen(false)} />
+            ) : (
+              <StyledDropDown as={ArrowDown} onClick={() => setOpen(true)} />
+            )}
+
+            {open && (
+              <Menu>
+                <TitleWrapper>
+                  <TitleText>
+                    {role === "STUDENT" ? "내 워크스페이스" : "내 수업"}
+                  </TitleText>
+                  {role === "STUDENT" && (
+                    <StyledTaskIcon onClick={() => navigate("/teamProject")} />
+                  )}
+                </TitleWrapper>
+                <ul>
+                  {items.length > 0 ? (
+                    items.map((item) => (
+                      <li
+                        key={item.id}
+                        onClick={() => {
+                          if (role === "STUDENT") {
+                            localStorage.setItem("teamId", item.id);
+                            navigate(`/project?teamId=${item.id}`);
+                          } else if (role === "PROFESSOR") {
+                            //navigate(`/class?classId=${item.id}`);
+                          }
+                          setOpen(false);
+                        }}
+                      >
+                        {item.name}
+                      </li>
+                    ))
+                  ) : (
+                    <li>목록이 없습니다</li>
+                  )}
+                </ul>
+              </Menu>
+            )}
+          </DropDownWrapper>
+        )}
+
+        {openLogout && <LogoutModal onClose={() => setOpenLogout(false)} />}
       </LogoContainer>
     </HeaderWrapper>
   );
