@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import {
-  AuthWrapper, AuthCard, Title, Subtitle, SubmitButton
+  AuthWrapper,
+  AuthCard,
+  Title,
+  Subtitle,
+  SubmitButton,
 } from "../../styles/Auth.styles";
 import InputField from "../../components/Login/InputField";
 import * as api from "../../api/login/login";
@@ -12,33 +16,32 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-const handleLogin = async () => {
-  try {
-    const response = await api.login({
-      email,
-      password: pw,
-    });
-    console.log("로그인 응답 결과:", response);
+  const handleLogin = async () => {
+    try {
+      const response = await api.login({
+        email,
+        password: pw,
+      });
+      console.log("로그인 응답 결과:", response);
 
+      // 응답 구조: { isSuccess, code, message, result }
+      if (response.isSuccess) {
+        const username = response.result.username;
+        const id = response.result.id;
 
-    // 응답 구조: { isSuccess, code, message, result }
-    if (response.isSuccess) {
-      const username = response.result.username;
-      localStorage.setItem("username", username);
+        localStorage.setItem("userId", id);
+        localStorage.setItem("username", username);
 
-      // alert("로그인 성공!");
-      navigate("/teamProject"); // 원하는 경로로 이동
-    } else {
-      alert(`로그인 실패: ${response.message}`);
+        // alert("로그인 성공!");
+        navigate("/teamProject"); // 원하는 경로로 이동
+      } else {
+        alert(`로그인 실패: ${response.message}`);
+      }
+    } catch (err) {
+      console.error("로그인 요청 에러:", err);
+      alert("로그인 실패");
     }
-
-  } catch (err) {
-    console.error("로그인 요청 에러:", err);
-    alert("로그인 실패");
-  }
-};
-
-
+  };
 
   return (
     <AuthWrapper>
