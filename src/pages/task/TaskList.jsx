@@ -12,13 +12,6 @@ const Content = styled.div`
   background: #f5f7fa;
 `;
 
-const Title = styled.h2`
-  font-size: 20px;
-  color: #343c6a;
-  font-weight: bold;
-  margin-bottom: 30px;
-`;
-
 export default function TaskList() {
   return (
     <Container>
