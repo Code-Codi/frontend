@@ -68,7 +68,7 @@ const ColoredIconBox = styled.div`
   }
 `;
 
-const items = [
+const studentItems = [
   { label: "홈", icon: HomeIcon, path: "/share" },
   { label: "가이드라인", icon: GuidelineIcon, path: "/guide" },
   { label: "프로젝트", icon: ProjectIcon, path: "/project" },
@@ -77,13 +77,35 @@ const items = [
   { label: "과제", icon: TaskIcon, path: "/taskList" },
 ];
 
+const professorItems = [
+  // { label: "홈", icon: HomeIcon, path: "/share" },
+  // { label: "가이드라인", icon: GuidelineIcon, path: "/guide" },
+  // { label: "프로젝트", icon: ProjectIcon, path: "/project" },
+  // { label: "회의록", icon: MeetingIcon, path: "/meetingList" },
+  // { label: "일정관리", icon: CalendarIcon, path: "/schedule" },
+  { label: "과제 생성", icon: TaskIcon, path: "/profesor/task/create" },
+  { label: "과제 확인", icon: TaskIcon, path: "/professor/taskList" },
+  // 교수만 볼 수 있는 또 다른 기능...
+];
+
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const teamId = localStorage.getItem("teamId");
+  const role = localStorage.getItem("role");
+  const items = role === "PROFESSOR" ? professorItems : studentItems;
 
   const getActiveIndex = () =>
-    items.findIndex((item) => location.pathname.startsWith(item.path));
+    items.findIndex((item) => {
+      if (item.path === "/professor/taskList") {
+        // "/professorTaskList"나 "/professorTaskDetail"로 시작한다면 같은 인디케이터
+        return (
+          location.pathname.startsWith("/professor/taskList") ||
+          location.pathname.startsWith("/professor/taskDetail")
+        );
+      }
+      return location.pathname.startsWith(item.path);
+    });
 
   const activeIndex = getActiveIndex();
 

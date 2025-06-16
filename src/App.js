@@ -12,6 +12,12 @@ import MeetingList from "./pages/meeting/MeetingList";
 import MeetingDetail from "./pages/meeting/MeetingDetailForm";
 import TaskList from "./pages/task/TaskList";
 import TaskDetail from "./pages/task/TaskDetailForm";
+
+// 교수 화면
+import ProfessorTaskCreate from "./pages/task/ProfessorTaskCreate";
+import ProfessorTaskDetail from "./pages/task/ProfessorTaskDetail";
+import ProfessorTaskList from "./pages/task/ProfessorTaskList";
+
 import Project from "./pages/project/Project";
 import TeamProject from "./pages/team/teamProject";
 
@@ -79,6 +85,16 @@ function AppRoutes() {
             />
             <Route path="/meetingCreate" element={<MeetingDetail />} />
             <Route path="/taskList" element={<TaskList />} />
+
+            <Route
+              path="/profesor/task/create"
+              element={<ProfessorTaskCreate />}
+            />
+            <Route path="/professor/taskList" element={<ProfessorTaskList />} />
+            <Route
+              path="/professor/taskDetail/:taskId"
+              element={<ProfessorTaskDetail />}
+            />
             <Route path="/taskDetail/:taskId" element={<TaskDetail />} />
             <Route path="/taskCreate" element={<TaskDetail />} />
             <Route path="/project" element={<Project />} />

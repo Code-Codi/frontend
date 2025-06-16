@@ -233,7 +233,8 @@ export default function Header() {
                             localStorage.setItem("teamId", item.id);
                             navigate(`/project?teamId=${item.id}`);
                           } else if (role === "PROFESSOR") {
-                            //navigate(`/class?classId=${item.id}`);
+                            localStorage.setItem("classId", item.id);
+                            // navigate(`/class?classId=${item.id}`);
                           }
                           setOpen(false);
                         }}
