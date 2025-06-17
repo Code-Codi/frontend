@@ -17,7 +17,7 @@ const Content = styled.div`
 `;
 
 const Section = styled.div`
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   width: 100%;
 `;
 
@@ -66,59 +66,27 @@ const DisplayBox = styled.div`
   cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
 `;
 
-const Dropdown = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  max-height: 160px;
-  overflow-y: auto;
-`;
-
-const Option = styled.div`
-  padding: 10px 16px;
-  font-size: 15px;
-  cursor: pointer;
-  background: ${({ selected }) => (selected ? "#e6f0ff" : "white")};
-
-  &:hover {
-    background: #f0f0f0;
-  }
-`;
-
 const TaskCard = styled.div`
   background: white;
   border-radius: 10px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-top: 12px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   width: 100%;
 `;
 
 const Label = styled.div`
-  font-weight: 600;
   margin-top: 12px;
+  font-size: 20px;
   color: #343c6a;
-`;
-
-const AddButton = styled.button`
-  font-size: 16px;
-  color: #1814f3;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  margin-top: 20px;
+  font-weight: bold;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-bottom: 20px;
 `;
 
 const ActionButton = styled.button`
@@ -135,7 +103,7 @@ const ActionButton = styled.button`
   }
 `;
 
-const DeleteButton = styled(ActionButton)`
+const CancelButton = styled(ActionButton)`
   background: white;
   color: red;
   border: 1px solid red;
@@ -146,15 +114,53 @@ const DeleteButton = styled(ActionButton)`
   }
 `;
 
-const DeleteIcon = styled.div`
+const TextareaWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const StyledTextarea = styled.textarea`
+  height: 100px;
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+  margin-top: 8px;
+
+  &:disabled {
+    background: #f5f5f5;
+    color: #888;
+  }
+`;
+
+const FileLabel = styled.label`
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #0f0cc0;
+  color: #ffffff;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 35px;
-  color: #888;
-  padding: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  align-self: flex-start;
 
   &:hover {
-    color: red;
+    background: #0056b3;
   }
+`;
+
+const FileInput = styled.input`
+  display: none;
+`;
+
+const FileInfo = styled.div`
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
 `;
 
 export default function TaskDetailForm() {
@@ -162,12 +168,8 @@ export default function TaskDetailForm() {
 
   const { taskId } = useParams();
   const [title, setTitle] = useState("");
-  const [participants, setParticipants] = useState([]);
   const [tasks, setTasks] = useState([{ title: "", detail: "" }]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef(null);
   const [editing, setEditing] = useState(false);
-  const participantOptions = ["ALL", "세미", "수현", "민경", "세령"];
   const location = useLocation();
   const isCreateMode = location.pathname === "/taskCreate";
   const navigate = useNavigate();
@@ -269,152 +271,97 @@ export default function TaskDetailForm() {
     }
   };
 
-  const handleDeleteTask = async () => {
-    const confirm = window.confirm("정말 이 과제를 삭제하시겠습니까?");
-    if (!confirm || !taskId) return;
-    try {
-      await axios.delete(`http://localhost:8080/tasks/${taskId}`);
-      alert("과제가 삭제되었습니다.");
-      navigate("/taskList"); // 삭제 후 목록으로 이동
-    } catch (error) {
-      console.error("과제 삭제 실패:", error);
-      alert("과제 삭제에 실패했습니다.");
-    }
+  const handleTaskChange = (idx, field, value) => {
+    setTasks((prev) => {
+      const newTasks = [...prev];
+      newTasks[idx] = { ...newTasks[idx], [field]: value };
+      return newTasks;
+    });
   };
 
-  const handleDeleteDetail = async (idx, detailId) => {
-    const confirm = window.confirm("정말 이 과제 내용을 삭제하시겠습니까?");
-    if (!confirm) return;
-    try {
-      if (detailId) {
-        await axios.delete(`http://localhost:8080/task-details/${detailId}`);
-      }
-      const updated = [...tasks];
-      updated.splice(idx, 1);
-      setTasks(updated);
-    } catch (error) {
-      console.error("상세 과제 삭제 실패:", error);
-      alert("과제 상세 내용 삭제에 실패했습니다.");
-    }
+  const handleFileChange = (idx, file) => {
+    setTasks((prev) => {
+      const newTasks = [...prev];
+      newTasks[idx] = { ...newTasks[idx], file };
+      return newTasks;
+    });
   };
 
-  const handleToggleSelect = (value) => {
-    if (value === "ALL") {
-      setParticipants(["ALL"]);
-    } else {
-      setParticipants((prev) => {
-        const exists = prev.includes(value);
-        const filtered = prev.filter((p) => p !== "ALL");
-        return exists
-          ? filtered.filter((p) => p !== value)
-          : [...filtered, value];
-      });
-    }
+  const formatFileSize = (size) => {
+    return (size / 1024).toFixed(1) + " KB";
   };
-
-  const renderParticipantDisplay = () => {
-    return participants.length === 0
-      ? "참가자"
-      : participants.includes("ALL")
-      ? "ALL"
-      : participants.join(", ");
-  };
-
-  const addTask = () => {
-    setTasks([...tasks, { title: "", detail: "" }]);
-  };
-
-  const handleTaskChange = (idx, key, value) => {
-    const updated = [...tasks];
-    updated[idx][key] = value;
-    setTasks(updated);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <Container>
       <Content>
         <Section>
-          <SectionTitle>과제 제출 및 조회</SectionTitle>
-          <Input
-            placeholder="과제 제목을 입력하세요."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            disabled={!editing}
-          />
+          <SectionTitle disabled>과제 제출 및 조회</SectionTitle>
+          <Input value={title} disabled />
           <Row>
-            <div style={{ position: "relative" }} ref={dropdownRef}>
-              <DisplayBox
-                disabled={!editing}
-                onClick={() => editing && setShowDropdown(!showDropdown)}
-              >
-                {renderParticipantDisplay()}
+            <div>
+              <Label>기간</Label>
+              <DisplayBox disabled>
+                2025.06.08 오후 11:59 ~ 2025.06.30 오후 11:59
               </DisplayBox>
-              {showDropdown && (
-                <Dropdown>
-                  {participantOptions.map((name) => (
-                    <Option
-                      key={name}
-                      selected={participants.includes(name)}
-                      onClick={() => handleToggleSelect(name)}
-                    >
-                      {name}
-                    </Option>
-                  ))}
-                </Dropdown>
-              )}
+            </div>
+          </Row>
+          <Row>
+            <div>
+              <Label>팀명</Label>
+              <DisplayBox disabled>팀명</DisplayBox>
+            </div>
+            <div>
+              <Label>제출 날짜</Label>
+              <DisplayBox disabled>2025.04.29 오전 9:20:49</DisplayBox>
             </div>
           </Row>
         </Section>
 
         <Section>
-          <SectionTitle>과제 내용</SectionTitle>
+          <Label>과제 내용</Label>
           {tasks.map((task, idx) => (
             <TaskCard key={idx}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Label>과제 {idx + 1} 제목</Label>
-                {editing && (
-                  <DeleteIcon onClick={() => handleDeleteDetail(idx, task.id)}>
-                    🗑
-                  </DeleteIcon>
+              <Input value={task.title} disabled />
+              <Input value={task.detail} disabled />
+              <TextareaWrapper key={idx}>
+                <StyledTextarea
+                  placeholder="과제 내용 입력"
+                  value={task.detail}
+                  onChange={(e) =>
+                    handleTaskChange(idx, "detail", e.target.value)
+                  }
+                  disabled={!editing}
+                />
+                {editing ? (
+                  <>
+                    {task.file && (
+                      <FileInfo>
+                        선택된 파일: {task.file.name} (
+                        {formatFileSize(task.file.size)})
+                      </FileInfo>
+                    )}
+                    <FileLabel htmlFor={`file-${idx}`}>파일 선택</FileLabel>
+                    <FileInput
+                      id={`file-${idx}`}
+                      type="file"
+                      onChange={(e) =>
+                        handleFileChange(idx, e.target.files?.[0])
+                      }
+                    />
+                  </>
+                ) : (
+                  task.file && (
+                    <FileInfo>
+                      첨부파일:{" "}
+                      <a href={task.fileUrl} target="_blank" rel="noreferrer">
+                        {task.fileName}
+                      </a>
+                    </FileInfo>
+                  )
                 )}
-              </div>
-              <Input
-                placeholder="과제 제목을 입력하세요."
-                value={task.title}
-                onChange={(e) => handleTaskChange(idx, "title", e.target.value)}
-                disabled={!editing}
-              />
-              <Label>상세 항목</Label>
-              <Input
-                placeholder="상세 항목 입력"
-                value={task.detail}
-                onChange={(e) =>
-                  handleTaskChange(idx, "detail", e.target.value)
-                }
-                disabled={!editing}
-              />
+              </TextareaWrapper>
             </TaskCard>
           ))}
-
-          {editing && (
-            <AddButton onClick={addTask}>＋ 과제 내용 추가</AddButton>
-          )}
         </Section>
 
         <ButtonGroup>
@@ -424,8 +371,10 @@ export default function TaskDetailForm() {
             <ActionButton onClick={() => setEditing(true)}>수정</ActionButton>
           ) : (
             <>
-              <DeleteButton onClick={handleDeleteTask}>전체 삭제</DeleteButton>
-              <ActionButton onClick={handleUpdate}>저장</ActionButton>
+              <CancelButton onClick={() => setEditing(false)}>
+                취소
+              </CancelButton>
+              <ActionButton onClick={handleUpdate}>제출</ActionButton>
             </>
           )}
         </ButtonGroup>
