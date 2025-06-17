@@ -83,8 +83,8 @@ const professorItems = [
   // { label: "프로젝트", icon: ProjectIcon, path: "/project" },
   // { label: "회의록", icon: MeetingIcon, path: "/meetingList" },
   // { label: "일정관리", icon: CalendarIcon, path: "/schedule" },
-  { label: "과제 생성", icon: TaskIcon, path: "/profesor/task/create" },
-  { label: "과제 확인", icon: TaskIcon, path: "/professor/taskList" },
+  { label: "과제 생성", icon: TaskIcon, path: "/professor/taskList" },
+  { label: "과제 확인", icon: TaskIcon, path: "/professor/team/taskList" },
   // 교수만 볼 수 있는 또 다른 기능...
 ];
 
@@ -97,11 +97,30 @@ const Sidebar = () => {
 
   const getActiveIndex = () =>
     items.findIndex((item) => {
-      if (item.path === "/professor/taskList") {
+      if (item.path === "/professor/team/taskList") {
         // "/professorTaskList"나 "/professorTaskDetail"로 시작한다면 같은 인디케이터
         return (
+          location.pathname.startsWith("/professor/team/taskList") ||
+          location.pathname.startsWith("/professor/team/taskDetail")
+        );
+      }
+      if (item.path === "/professor/taskList") {
+        return (
           location.pathname.startsWith("/professor/taskList") ||
-          location.pathname.startsWith("/professor/taskDetail")
+          location.pathname.startsWith("/professor/taskDetail") ||
+          location.pathname.startsWith("/professor/taskCreate")
+        );
+      }
+      if (item.path == "/meetingList") {
+        return (
+          location.pathname.startsWith("/meetingList") ||
+          location.pathname.startsWith("/meetingDetail")
+        );
+      }
+      if (item.path == "/taskList") {
+        return (
+          location.pathname.startsWith("/taskList") ||
+          location.pathname.startsWith("/taskDetail")
         );
       }
       return location.pathname.startsWith(item.path);
@@ -111,7 +130,7 @@ const Sidebar = () => {
 
   const handleItemClick = (path) => {
     if (path) {
-      if (teamId) {
+      if (teamId && role === "STUDENT") {
         navigate(`${path}?teamId=${teamId}`);
       } else {
         navigate(path);

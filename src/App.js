@@ -14,9 +14,10 @@ import TaskList from "./pages/task/TaskList";
 import TaskDetail from "./pages/task/TaskDetailForm";
 
 // 교수 화면
-import ProfessorTaskCreate from "./pages/task/ProfessorTaskCreate";
-import ProfessorTaskDetail from "./pages/task/ProfessorTaskDetail";
 import ProfessorTaskList from "./pages/task/ProfessorTaskList";
+import ProfessorTeamTaskDetail from "./pages/task/ProfessorTeamTaskDetail";
+import ProfessorTaskDetail from "./pages/task/ProfessorTaskDetail";
+import ProfessorTeamTaskList from "./pages/task/ProfessorTeamTaskList";
 
 import Project from "./pages/project/Project";
 import TeamProject from "./pages/team/teamProject";
@@ -86,15 +87,28 @@ function AppRoutes() {
             <Route path="/meetingCreate" element={<MeetingDetail />} />
             <Route path="/taskList" element={<TaskList />} />
 
-            <Route
-              path="/profesor/task/create"
-              element={<ProfessorTaskCreate />}
-            />
+            {/* 교수가 생성한 과제 리스트 */}
             <Route path="/professor/taskList" element={<ProfessorTaskList />} />
             <Route
               path="/professor/taskDetail/:taskId"
               element={<ProfessorTaskDetail />}
             />
+
+            {/* 교수가 팀에 대한 과제 리스트 */}
+            <Route
+              path="/professor/team/taskList"
+              element={<ProfessorTeamTaskList />}
+            />
+            {/* 교수가 팀에 대한 과제 리스트 - 상세 */}
+            <Route
+              path="/professor/team/taskDetail/:taskId"
+              element={<ProfessorTeamTaskDetail />}
+            />
+            <Route
+              path="/professor/taskCreate"
+              element={<ProfessorTaskDetail />}
+            />
+
             <Route path="/taskDetail/:taskId" element={<TaskDetail />} />
             <Route path="/taskCreate" element={<TaskDetail />} />
             <Route path="/project" element={<Project />} />
