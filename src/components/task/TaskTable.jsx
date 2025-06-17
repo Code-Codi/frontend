@@ -13,7 +13,7 @@ const Table = styled.table`
 
 const Th = styled.th`
   font-size: 15px;
-  color: #8A8A8A;
+  color: #8a8a8a;
   font-weight: 500;
   padding: 15px;
   text-align: center;
@@ -22,7 +22,7 @@ const Th = styled.th`
 
 const Td = styled.td`
   font-size: 15px;
-  color: #343C6A;
+  color: #343c6a;
   padding: 15px;
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
@@ -41,7 +41,6 @@ const SubmitButton = styled.button`
   border-radius: 20px;
   background: ${({ submitted }) => (submitted ? "#fff" : "#fff")};
   color: ${({ submitted }) => (submitted ? "#1814f3" : "#000")};
-  cursor: ${({ submitted }) => (submitted ? "default" : "pointer")};
 `;
 
 const PlusButton = styled.div`
@@ -84,79 +83,83 @@ const HeaderRow = styled.div`
 `;
 
 export default function TaskTable() {
-    const navigate = useNavigate();
-    const [tasks, setTasks] = useState([]);
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
-    const teamId = localStorage.getItem("teamId");
-    const fetchTasks = async (pageNum = 0) => {
-        try {
-            const res = await axios.get(`http://localhost:8080/tasks?teamId=${teamId}&page=${pageNum}&size=10`);
-            setTasks(res.data.content);
-            setPage(res.data.number);
-            setTotalPages(res.data.totalPages);
-        } catch (error) {
-            console.error("과제 리스트 조회 실패:", error);
-        }
-    };
+  const navigate = useNavigate();
+  const [tasks, setTasks] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const teamId = localStorage.getItem("teamId");
+  const fetchTasks = async (pageNum = 0) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/tasks?teamId=${teamId}&page=${pageNum}&size=10`
+      );
+      setTasks(res.data.content);
+      setPage(res.data.number);
+      setTotalPages(res.data.totalPages);
+    } catch (error) {
+      console.error("과제 리스트 조회 실패:", error);
+    }
+  };
 
-    useEffect(() => {
-        fetchTasks(0);
-    }, [teamId]);
+  useEffect(() => {
+    fetchTasks(0);
+  }, [teamId]);
 
-    const handleSubmit = (task) => {
-        if (window.confirm("과제를 제출하시겠습니까?")) {
-            alert("제출되었습니다 (로직 구현 필요)");
-        }
-    };
+  const handleSubmit = (task) => {
+    if (window.confirm("과제를 제출하시겠습니까?")) {
+      alert("제출되었습니다 (로직 구현 필요)");
+    }
+  };
 
-    const goToDetail = (taskId) => {
-        navigate(`/taskDetail/${taskId}`);
-    };
+  const goToDetail = (taskId) => {
+    navigate(`/taskDetail/${taskId}`);
+  };
 
-    const handleCreateTask = () => {
-        navigate(`/taskCreate`);
-    };
+  const handleCreateTask = () => {
+    navigate(`/taskCreate`);
+  };
 
-    return (
-        <>
-            <HeaderRow>
-                <h2 style={{ fontSize: "20px", color: "#343C6A", fontWeight: "bold" }}>과제 리스트</h2>
-                <PlusButton onClick={handleCreateTask}>＋</PlusButton>
-            </HeaderRow>
+  return (
+    <>
+      <HeaderRow>
+        <h2 style={{ fontSize: "20px", color: "#343C6A", fontWeight: "bold" }}>
+          과제 리스트
+        </h2>
+        <PlusButton onClick={handleCreateTask}>＋</PlusButton>
+      </HeaderRow>
 
-            <Table>
-                <thead>
-                <tr>
-                    <Th>No</Th>
-                    <Th>날짜</Th>
-                    <Th>제목</Th>
-                    <Th>상태</Th>
-                </tr>
-                </thead>
-                <tbody>
-                {tasks.map((task, idx) => (
-                    <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
-                        <Td>{page * 10 + idx + 1}</Td>
-                        <Td>{task.taskDate}</Td>
-                        <Td>{task.title}</Td>
-                        <Td>
-                            <SubmitButton submitted={task.status === "COMPLETE"}>
-                                {task.status === "COMPLETE" ? "제출완료" : "제출전"}
-                            </SubmitButton>
-                        </Td>
-                    </TableRow>
-                ))}
-                </tbody>
-            </Table>
+      <Table>
+        <thead>
+          <tr>
+            <Th>No</Th>
+            <Th>날짜</Th>
+            <Th>제목</Th>
+            <Th>상태</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {tasks.map((task, idx) => (
+            <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
+              <Td>{page * 10 + idx + 1}</Td>
+              <Td>{task.taskDate}</Td>
+              <Td>{task.title}</Td>
+              <Td>
+                <SubmitButton submitted={task.status === "COMPLETE"}>
+                  {task.status === "COMPLETE" ? "제출완료" : "제출전"}
+                </SubmitButton>
+              </Td>
+            </TableRow>
+          ))}
+        </tbody>
+      </Table>
 
-            <Pagination>
-                {Array.from({ length: totalPages }, (_, i) => (
-                    <PageButton key={i} active={i === page} onClick={() => fetchTasks(i)}>
-                        {i + 1}
-                    </PageButton>
-                ))}
-            </Pagination>
-        </>
-    );
+      <Pagination>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <PageButton key={i} active={i === page} onClick={() => fetchTasks(i)}>
+            {i + 1}
+          </PageButton>
+        ))}
+      </Pagination>
+    </>
+  );
 }
