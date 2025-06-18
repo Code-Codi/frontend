@@ -226,9 +226,9 @@ export default function ProfessorTaskDetail() {
     const confirm = window.confirm("정말 이 과제를 삭제하시겠습니까?");
     if (!confirm || !taskGuideId) return;
     try {
-      await axios.delete(`http://localhost:8080/tasks/${taskGuideId}`);
+      await axios.delete(`http://localhost:8080/taskGuide/${taskGuideId}`);
       alert("과제가 삭제되었습니다.");
-      navigate("/taskList"); // 삭제 후 목록으로 이동
+      navigate("/professor/taskList"); // 삭제 후 목록으로 이동
     } catch (error) {
       console.error("과제 삭제 실패:", error);
       alert("과제 삭제에 실패했습니다.");
@@ -240,7 +240,7 @@ export default function ProfessorTaskDetail() {
     if (!confirm) return;
     try {
       if (detailId) {
-        await axios.delete(`http://localhost:8080/task-details/${detailId}`);
+        await axios.delete(`http://localhost:8080/taskGuide-details/${detailId}`);
       }
       const updated = [...tasks];
       updated.splice(idx, 1);
