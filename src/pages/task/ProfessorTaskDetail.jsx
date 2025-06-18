@@ -129,7 +129,7 @@ export default function ProfessorTaskDetail() {
     if (!taskGuideId && isCreateMode) {
       setEditing(true);
     }
-    if (taskGuideId && location.pathname.startsWith("/taskDetail")) {
+    if (taskGuideId && location.pathname.includes("/taskDetail")) {
       setEditing(false);
     }
   }, [taskGuideId, location.pathname]);
@@ -165,24 +165,23 @@ export default function ProfessorTaskDetail() {
     try {
       // 1. Task 생성
       const taskResponse = await axios.post("http://localhost:8080/taskGuide", {
-        //teamId: parseInt(teamId),
+        courseId: 2,
         title: title,
-        status: "IN_PROGRESS",
-        taskDate: new Date().toISOString().slice(0, 10), // yyyy-MM-dd 형식
+        dueDate: endDate,
       });
 
       const taskGuideId = taskResponse.data;
 
       // 2. 각 TaskDetail 등록
       for (const task of tasks) {
-        await axios.post("http://localhost:8080/task-details", {
+        await axios.post("http://localhost:8080/taskGuide-details", {
           taskGuideId: taskGuideId,
           title: task.title,
-          content: task.detail,
+          description: task.detail,
         });
       }
       alert("과제가 성공적으로 등록되었습니다!");
-      navigate(`/taskDetail/${taskGuideId}`);
+      navigate(`/professor/taskDetail/${taskGuideId}`);
     } catch (error) {
       console.error("등록 중 오류:", error);
       alert("과제 등록에 실패했습니다.");
