@@ -103,7 +103,7 @@ function AppRoutes() {
             />
             {/* 교수가 팀에 대한 과제 리스트 - 상세 */}
             <Route
-              path="/professor/team/taskDetail/:taskGuideId"
+              path="/professor/team/taskDetail/:taskId"
               element={<ProfessorTeamTaskDetail />}
             />
             <Route

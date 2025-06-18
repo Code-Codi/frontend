@@ -84,6 +84,17 @@ const PlusButton = styled.div`
   }
 `;
 
+const NotifyButton = styled.button`
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  background: ${({ disabled }) => (disabled ? "#ddd" : "#fff")};
+  color: ${({ disabled }) => (disabled ? "#888" : "#1814f3")};
+  border: 1px solid #ccc;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  transition: background 0.2s;
+`;
+
 const formatDate = (iso) => {
   if (!iso) return "";
   const date = new Date(iso);
@@ -98,7 +109,8 @@ export default function ProfessorTaskList() {
   const [taskGuides, setTaskGuides] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
-  const courseId = 2; //우선 하드코딩
+  const courseId = localStorage.getItem("courseId");
+  const [notifiedTaskIds, setNotifiedTaskIds] = useState([]);
 
   const goToDetail = (taskGuideId) => {
     navigate(`/professor/taskDetail/${taskGuideId}`);
@@ -125,6 +137,21 @@ export default function ProfessorTaskList() {
     navigate(`/professor/taskCreate`); //임시설정
   };
 
+  const handleNotify = async (e, taskGuideId) => {
+    e.stopPropagation(); // row 클릭 막기
+    const confirmSend = window.confirm("해당 과제를 학생 팀에게 공지하시겠습니까?");
+    if (!confirmSend) return;
+
+    try {
+      await axios.post(`http://localhost:8080/taskGuide/${taskGuideId}/generateTasks`);
+      alert("과제가 성공적으로 학생들에게 공지되었습니다.");
+
+      setNotifiedTaskIds((prev) => [...prev, taskGuideId]); //
+    } catch (error) {
+      console.error("과제 공지 실패:", error);
+      alert("공지 중 오류가 발생했습니다.");
+    }
+  };
   return (
     <Container>
       <Content>
@@ -153,6 +180,14 @@ export default function ProfessorTaskList() {
                   {formatDate(task.createAt)} ~ {formatDate(task.dueDate)}
                 </Td>
                 <Td>{task.title}</Td>
+                <Td>
+                  <NotifyButton
+                      disabled={notifiedTaskIds.includes(task.id)}
+                      onClick={(e) => handleNotify(e, task.id)}
+                  >
+                    {notifiedTaskIds.includes(task.id) ? "공지 완료" : "공지"}
+                  </NotifyButton>
+                </Td>
               </TableRow>
           ))}
           </tbody>

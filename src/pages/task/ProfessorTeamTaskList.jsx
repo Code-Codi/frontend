@@ -144,44 +144,86 @@ const OptionItem = styled.li`
   }
 `;
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return "제출전";
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+};
+
 export default function ProfessorTeamTaskList() {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
   const [open, setOpen] = useState(false);
+  const courseId = localStorage.getItem("courseId");
 
   // 팀 목록 (실제 API 연동 시 바꿔주세요)
-  const teamOptions = [
-    { id: 1, name: "1팀" },
-    { id: 2, name: "2팀" },
-    { id: 3, name: "3팀" },
-    { id: 4, name: "4팀" },
-  ];
+  const [teamOptions, setTeamOptions] = useState([]);
 
   // 초기값은 기본 첫 번째 팀
-  const [selectedTeamId, setSelectedTeamId] = useState(teamOptions[0].id);
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
 
-  const selectedTeam =
-    teamOptions.find((team) => team.id === selectedTeamId) || teamOptions[0];
+
+  useEffect(() => {
+    const fetchTeamOptions = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/teamProject/teams/course", {
+          params: { courseId: localStorage.getItem("courseId") },
+        });
+
+        const fetchedTeams = res.data.result.map(team => ({
+          id: team.teamid,
+          name: team.name,
+        }));
+
+        console.log("🟢 실제 팀 목록 (state 반영됨):", fetchedTeams);
+        setTeamOptions(fetchedTeams);
+
+        // 초기 선택값 설정
+        if (fetchedTeams.length > 0) {
+          setSelectedTeamId(fetchedTeams[0].id);
+          localStorage.setItem("teamId", fetchedTeams[0].id);
+        }
+      } catch (error) {
+        console.error("🔴 팀 목록 불러오기 실패:", error);
+      }
+    };
+
+    fetchTeamOptions();
+  }, []);
+
+  const selectedTeam = teamOptions.find((team) => team.id === selectedTeamId);
+
+
 
   const fetchTasks = async (pageNum = 0, teamIdParam = selectedTeamId) => {
     try {
-      if (!teamIdParam) return;
-      const res = await axios.get(
-        `http://localhost:8080/tasks?teamId=${teamIdParam}&page=${pageNum}&size=10`
-      );
-      setTasks(res.data.content);
-      setPage(res.data.number);
-      setTotalPages(res.data.totalPages);
+      console.log("📌 현재 teamIdParam:", teamIdParam);
+
+      const res = await axios.get(`http://localhost:8080/tasks/teamTasks`, {
+        params: {
+          page: pageNum,
+          size: 10,
+          courseId: courseId,
+          teamId: teamIdParam,
+          status: "COMPLETE",
+        },
+      });
+
+      const result = res.data.result;
+      setTasks(result.content || []);
+      setPage(result.number);
+      setTotalPages(result.totalPages);
     } catch (error) {
       console.error("과제 리스트 조회 실패:", error);
     }
   };
 
   useEffect(() => {
-    fetchTasks(0, selectedTeamId);
+    if (selectedTeamId !== null) {
+      fetchTasks(0, selectedTeamId);
+    }
   }, [selectedTeamId]);
 
   const goToDetail = (taskId) => {
@@ -221,7 +263,7 @@ export default function ProfessorTeamTaskList() {
               role="button"
               aria-expanded={open}
             >
-              <SelectedText>{selectedTeam.name}</SelectedText>
+              <SelectedText>{selectedTeam?.name || "팀 선택"}</SelectedText>
               <Arrow open={open} />
             </SelectedBox>
             {open && (
@@ -250,9 +292,9 @@ export default function ProfessorTeamTaskList() {
             </thead>
             <tbody>
               {tasks.map((task, idx) => (
-                <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
+                <TableRow key={task.taskId} onClick={() => goToDetail(task.taskId)}>
                   <Td>{page * 10 + idx + 1}</Td>
-                  <Td>{task.taskDate}</Td>
+                  <Td>{formatDate(task.taskDate)}</Td>
                   <Td>{task.title}</Td>
                   <Td>
                     <SubmitButton submitted={task.status === "COMPLETE"}>

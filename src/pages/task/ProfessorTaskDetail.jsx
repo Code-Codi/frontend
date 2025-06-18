@@ -123,7 +123,7 @@ export default function ProfessorTaskDetail() {
   const isCreateMode = location.pathname === "/professor/taskCreate";
   const navigate = useNavigate();
   const [endDate, setEndDate] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
+  const courseId = localStorage.getItem("courseId");
 
   useEffect(() => {
     if (!taskGuideId && isCreateMode) {
@@ -145,7 +145,6 @@ export default function ProfessorTaskDetail() {
 
           setTitle(data.title);
           setEndDate(data.dueDate?.slice(0, 16));
-          setCreatedAt(data.createAt);
           setTasks(
             data.details.map((detail) => ({
               id: detail.id,
@@ -165,7 +164,7 @@ export default function ProfessorTaskDetail() {
     try {
       // 1. Task 생성
       const taskResponse = await axios.post("http://localhost:8080/taskGuide", {
-        courseId: 2,
+        courseId: courseId,
         title: title,
         dueDate: endDate,
       });
