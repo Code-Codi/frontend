@@ -34,7 +34,7 @@ const Login = () => {
         if (response.result.role == "STUDENT") {
           navigate("/teamProject");
         } else if (response.result.role == "PROFESSOR") {
-          navigate("/taskList"); // 임시 설정
+          navigate("/professor/taskList"); // 임시 설정
         }
       }
     } catch (err) {

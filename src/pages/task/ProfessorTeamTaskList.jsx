@@ -159,27 +159,54 @@ export default function ProfessorTeamTaskList() {
   const courseId = localStorage.getItem("courseId");
 
   // 팀 목록 (실제 API 연동 시 바꿔주세요)
-  const teamOptions = [
-    { id: 1, name: "1팀" },
-    { id: 2, name: "2팀" },
-    { id: 3, name: "3팀" },
-    { id: 4, name: "4팀" },
-  ];
+  const [teamOptions, setTeamOptions] = useState([]);
 
   // 초기값은 기본 첫 번째 팀
-  const [selectedTeamId, setSelectedTeamId] = useState(teamOptions[0].id);
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
 
-  const selectedTeam =
-    teamOptions.find((team) => team.id === selectedTeamId) || teamOptions[0];
+
+  useEffect(() => {
+    const fetchTeamOptions = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/teamProject/teams/course", {
+          params: { courseId: localStorage.getItem("courseId") },
+        });
+
+        const fetchedTeams = res.data.result.map(team => ({
+          id: team.teamid,
+          name: team.name,
+        }));
+
+        console.log("🟢 실제 팀 목록 (state 반영됨):", fetchedTeams);
+        setTeamOptions(fetchedTeams);
+
+        // 초기 선택값 설정
+        if (fetchedTeams.length > 0) {
+          setSelectedTeamId(fetchedTeams[0].id);
+          localStorage.setItem("teamId", fetchedTeams[0].id);
+        }
+      } catch (error) {
+        console.error("🔴 팀 목록 불러오기 실패:", error);
+      }
+    };
+
+    fetchTeamOptions();
+  }, []);
+
+  const selectedTeam = teamOptions.find((team) => team.id === selectedTeamId);
+
+
 
   const fetchTasks = async (pageNum = 0, teamIdParam = selectedTeamId) => {
     try {
+      console.log("📌 현재 teamIdParam:", teamIdParam);
+
       const res = await axios.get(`http://localhost:8080/tasks/teamTasks`, {
         params: {
           page: pageNum,
           size: 10,
           courseId: courseId,
-          teamId: 164,
+          teamId: teamIdParam,
           status: "COMPLETE",
         },
       });
@@ -194,7 +221,9 @@ export default function ProfessorTeamTaskList() {
   };
 
   useEffect(() => {
-    fetchTasks(0, selectedTeamId);
+    if (selectedTeamId !== null) {
+      fetchTasks(0, selectedTeamId);
+    }
   }, [selectedTeamId]);
 
   const goToDetail = (taskId) => {
@@ -234,7 +263,7 @@ export default function ProfessorTeamTaskList() {
               role="button"
               aria-expanded={open}
             >
-              <SelectedText>{selectedTeam.name}</SelectedText>
+              <SelectedText>{selectedTeam?.name || "팀 선택"}</SelectedText>
               <Arrow open={open} />
             </SelectedBox>
             {open && (
