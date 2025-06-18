@@ -123,7 +123,6 @@ export default function ProfessorTaskDetail() {
   const isCreateMode = location.pathname === "/professor/taskCreate";
   const navigate = useNavigate();
   const [endDate, setEndDate] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
 
   useEffect(() => {
     if (!taskGuideId && isCreateMode) {
