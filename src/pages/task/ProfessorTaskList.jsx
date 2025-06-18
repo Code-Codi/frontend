@@ -98,7 +98,7 @@ export default function ProfessorTaskList() {
   const [taskGuides, setTaskGuides] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
-  const courseId = 2; //우선 하드코딩
+  const courseId = localStorage.getItem("courseId");
 
   const goToDetail = (taskGuideId) => {
     navigate(`/professor/taskDetail/${taskGuideId}`);

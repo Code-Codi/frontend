@@ -156,6 +156,7 @@ export default function ProfessorTeamTaskList() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [open, setOpen] = useState(false);
+  const courseId = localStorage.getItem("courseId");
 
   // 팀 목록 (실제 API 연동 시 바꿔주세요)
   const teamOptions = [
@@ -177,7 +178,7 @@ export default function ProfessorTeamTaskList() {
         params: {
           page: pageNum,
           size: 10,
-          courseId: 1,
+          courseId: courseId,
           teamId: 164,
           status: "COMPLETE",
         },
