@@ -84,91 +84,42 @@ const PlusButton = styled.div`
   }
 `;
 
+const formatDate = (iso) => {
+  if (!iso) return "";
+  const date = new Date(iso);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd}`;
+};
+
 export default function ProfessorTaskList() {
   const navigate = useNavigate();
-  //const [tasks, setTasks] = useState([]);
+  const [taskGuides, setTaskGuides] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
+  const courseId = 2; //우선 하드코딩
 
-  const tasks = [
-    {
-      id: 1,
-      startDate: "2025-06-15",
-      endDate: "2025-06-30",
-      title: "1차 과제",
-    },
-    {
-      id: 2,
-      startDate: "2025-07-01",
-      endDate: "2025-07-15",
-      title: "2차 과제",
-    },
-    {
-      id: 3,
-      startDate: "2025-07-20",
-      endDate: "2025-08-05",
-      title: "3차 과제",
-    },
-    {
-      id: 4,
-      startDate: "2025-08-10",
-      endDate: "2025-08-25",
-      title: "4차 과제",
-    },
-    {
-      id: 5,
-      startDate: "2025-09-01",
-      endDate: "2025-09-15",
-      title: "5차 과제",
-    },
-    {
-      id: 6,
-      startDate: "2025-09-01",
-      endDate: "2025-09-15",
-      title: "5차 과제",
-    },
-    {
-      id: 7,
-      startDate: "2025-09-01",
-      endDate: "2025-09-15",
-      title: "5차 과제",
-    },
-    {
-      id: 8,
-      startDate: "2025-09-01",
-      endDate: "2025-09-15",
-      title: "5차 과제",
-    },
-    {
-      id: 9,
-      startDate: "2025-09-01",
-      endDate: "2025-09-15",
-      title: "5차 과제",
-    },
-    {
-      id: 10,
-      startDate: "2025-09-01",
-      endDate: "2025-09-15",
-      title: "5차 과제",
-    },
-  ];
-
-  const goToDetail = (taskId) => {
-    navigate(`/professor/taskDetail/${taskId}`);
+  const goToDetail = (taskGuideId) => {
+    navigate(`/professor/taskDetail/${taskGuideId}`);
   };
 
   const fetchTasks = async (pageNum = 0) => {
-    // try {
-    //   const res = await axios.get(
-    //     http://localhost:8080/tasks?teamId=${teamId}&page=${pageNum}&size=10
-    //   );
-    //   setTasks(res.data.content);
-    //   setPage(res.data.number);
-    //   setTotalPages(res.data.totalPages);
-    // } catch (error) {
-    //   console.error("과제 리스트 조회 실패:", error);
-    // }
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/taskGuide?courseId=${courseId}&page=${pageNum}&size=10`
+      );
+      setTaskGuides(res.data.content);
+      setPage(res.data.number);
+      setTotalPages(res.data.totalPages);
+    } catch (error) {
+      console.error("과제 리스트 조회 실패:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchTasks(0);
+  }, []);
 
   const handleCreateTask = () => {
     navigate(`/professor/taskCreate`); //임시설정
@@ -188,34 +139,34 @@ export default function ProfessorTaskList() {
 
         <Table>
           <thead>
-            <tr>
-              <Th>No</Th>
-              <Th>기간</Th>
-              <Th>제목</Th>
-            </tr>
+          <tr>
+            <Th>No</Th>
+            <Th>기간</Th>
+            <Th>제목</Th>
+          </tr>
           </thead>
           <tbody>
-            {tasks.map((task, idx) => (
+          {taskGuides.map((task, idx) => (
               <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
                 <Td>{page * 10 + idx + 1}</Td>
                 <Td>
-                  {task.startDate} ~{task.endDate}
+                  {formatDate(task.createAt)} ~ {formatDate(task.dueDate)}
                 </Td>
                 <Td>{task.title}</Td>
               </TableRow>
-            ))}
+          ))}
           </tbody>
         </Table>
 
         <Pagination>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <PageButton
-              key={i}
-              active={i === page}
-              onClick={() => fetchTasks(i)}
-            >
-              {i + 1}
-            </PageButton>
+          {Array.from({length: totalPages}, (_, i) => (
+              <PageButton
+                  key={i}
+                  active={i === page}
+                  onClick={() => fetchTasks(i)}
+              >
+                {i + 1}
+              </PageButton>
           ))}
         </Pagination>
       </Content>
