@@ -43,17 +43,6 @@ const SubmitButton = styled.button`
   color: ${({ submitted }) => (submitted ? "#1814f3" : "#000")};
 `;
 
-const PlusButton = styled.div`
-  text-align: center;
-  font-size: 26px;
-  margin-top: 25px;
-  cursor: pointer;
-
-  &:hover {
-    color: #1814f3;
-  }
-`;
-
 const Pagination = styled.div`
   display: flex;
   justify-content: center;
@@ -81,6 +70,15 @@ const HeaderRow = styled.div`
   align-items: center;
   margin-bottom: 10px;
 `;
+
+const formatDate = (iso) => {
+  if (!iso) return "";
+  const date = new Date(iso);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd}`;
+};
 
 export default function TaskTable() {
   const navigate = useNavigate();
@@ -115,9 +113,21 @@ export default function TaskTable() {
     navigate(`/taskDetail/${taskId}`);
   };
 
-  const handleCreateTask = () => {
-    navigate(`/taskCreate`);
+  const handleToggleStatus = async (task) => {
+    const nextStatus = task.status === "IN_PROGRESS" ? "제출 완료" : "제출 전";
+    const confirm = window.confirm(`"${nextStatus}" 상태로 바꾸시겠습니까?`);
+    if (!confirm) return;
+
+    try {
+      await axios.patch(`http://localhost:8080/tasks/${task.taskId}/status`);
+      alert(`상태가 "${nextStatus}"로 변경되었습니다.`);
+      fetchTasks(page); // 변경 후 최신 리스트 다시 불러오기
+    } catch (err) {
+      console.error("상태 변경 실패:", err);
+      alert("상태 변경 중 오류 발생");
+    }
   };
+
 
   return (
     <>
@@ -125,26 +135,31 @@ export default function TaskTable() {
         <h2 style={{ fontSize: "20px", color: "#343C6A", fontWeight: "bold" }}>
           과제 리스트
         </h2>
-        <PlusButton onClick={handleCreateTask}>＋</PlusButton>
       </HeaderRow>
 
       <Table>
         <thead>
           <tr>
             <Th>No</Th>
-            <Th>날짜</Th>
+            <Th>제출 기한</Th>
             <Th>제목</Th>
             <Th>상태</Th>
           </tr>
         </thead>
         <tbody>
           {tasks.map((task, idx) => (
-            <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
+            <TableRow key={task.taskId} onClick={() => goToDetail(task.taskId)}>
               <Td>{page * 10 + idx + 1}</Td>
-              <Td>{task.taskDate}</Td>
+              <Td>{`${formatDate(task.createAt)} ~ ${formatDate(task.dueDate)}`}</Td>
               <Td>{task.title}</Td>
               <Td>
-                <SubmitButton submitted={task.status === "COMPLETE"}>
+                <SubmitButton
+                    submitted={task.status === "COMPLETE"}
+                    onClick={(e) => {
+                      e.stopPropagation(); // 행 클릭 방지
+                      handleToggleStatus(task);
+                    }}
+                >
                   {task.status === "COMPLETE" ? "제출완료" : "제출전"}
                 </SubmitButton>
               </Td>

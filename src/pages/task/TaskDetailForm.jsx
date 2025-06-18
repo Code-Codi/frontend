@@ -40,7 +40,7 @@ const Input = styled.input`
 
 const Row = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
   font-size: 22px;
   color: #343c6a;
@@ -83,6 +83,15 @@ const ActionButton = styled.button`
     background: #0f0cc0;
   }
 `;
+
+const formatDate = (iso) => {
+  if (!iso) return "";
+  const date = new Date(iso);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd}`;
+};
 
 export default function ProfessorTaskDetail() {
   const { taskId } = useParams();
@@ -169,19 +178,17 @@ export default function ProfessorTaskDetail() {
               </div>
               <div>
                 <Label>제출일</Label>
-                <Input value={taskDate} readOnly/>
-              </div>
-            </Row>
-            <Row>
-              <div>
-                <Label>마감일</Label>
-                <Input value={dueDate} readOnly/>
+                <Input value={taskDate ? formatDate(taskDate) : "제출 전"} readOnly />
               </div>
               <div>
-                <Label>생성일</Label>
-                <Input value={createdAt} readOnly/>
+                <Label>제출 기한</Label>
+                <Input
+                    value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
+                    readOnly
+                />
               </div>
             </Row>
+
           </Section>
 
           <Section>
