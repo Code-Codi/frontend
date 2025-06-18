@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -17,7 +17,7 @@ const Content = styled.div`
 `;
 
 const Section = styled.div`
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   width: 100%;
 `;
 
@@ -36,40 +36,16 @@ const Input = styled.input`
   margin-top: 8px;
   box-sizing: border-box;
   height: 46px;
-  background: #f9f9f9;
-  cursor: default;
-
-  &:focus {
-    outline: none;
-    border-color: #ccc;
-    box-shadow: none;
-  }
 `;
 
 const Row = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
-  margin-top: 10px;
-`;
-
-const DisplayBox = styled.div`
-  width: 100%;
-  padding: 12px 16px;
-  margin-top: 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  background: #f9f9f9;
+  font-size: 22px;
   color: #343c6a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-sizing: border-box;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  cursor: default;
+  font-weight: bold;
+  margin-top: 10px;
 `;
 
 const TaskCard = styled.div`
@@ -87,30 +63,67 @@ const Label = styled.div`
   color: #343c6a;
 `;
 
-export default function ProfessorTeamTaskDetail() {
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+`;
+
+const ActionButton = styled.button`
+  background: #1814f3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: #0f0cc0;
+  }
+`;
+
+const formatDate = (iso) => {
+  if (!iso) return "";
+  const date = new Date(iso);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd}`;
+};
+
+export default function ProfessorTaskDetail() {
   const { taskId } = useParams();
   const [title, setTitle] = useState("");
-  const [participants, setParticipants] = useState([]);
-  const [tasks, setTasks] = useState([{ title: "", detail: "" }]);
-  const location = useLocation();
+  const [tasks, setTasks] = useState([]);
+  const [teamName, setTeamName] = useState("");
+  const [taskDate, setTaskDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
 
   useEffect(() => {
     if (taskId) {
       const fetchTask = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/tasks/${taskId}`
+              `http://localhost:8080/tasks/final/${taskId}`
           );
-          const data = response.data;
+          const data = response.data.result;
 
           setTitle(data.title);
-          setParticipants(data.participants || []);
+          setTeamName(data.teamName);
+          setTaskDate(data.taskDate);
+          setDueDate(data.dueDate?.slice(0, 16));
+          setCreatedAt(data.createAt?.slice(0, 16));
+
           setTasks(
-            data.details.map((detail) => ({
-              id: detail.id,
-              title: detail.title,
-              detail: detail.content,
-            }))
+              data.details.map((d) => ({
+                taskDetailId: d.taskDetailId,
+                title: d.title,
+                detail: d.description,
+                content: d.content,
+              }))
           );
         } catch (error) {
           console.error("과제 정보를 불러오는 데 실패했습니다:", error);
@@ -120,37 +133,47 @@ export default function ProfessorTeamTaskDetail() {
     }
   }, [taskId]);
 
-  const renderParticipantDisplay = () => {
-    return participants.length === 0
-      ? "참가자 없음"
-      : participants.includes("ALL")
-      ? "ALL"
-      : participants.join(", ");
-  };
-
   return (
-    <Container>
-      <Content>
-        <Section>
-          <SectionTitle>과제 제출 및 조회</SectionTitle>
-          <Input placeholder="과제 제목" value={title} readOnly />
-          <Row>
-            <DisplayBox>{renderParticipantDisplay()}</DisplayBox>
-          </Row>
-        </Section>
+      <Container>
+        <Content>
+          <Section>
+            <SectionTitle>과제 조회</SectionTitle>
+            <Input value={title} readOnly />
+            <Row>
+              <div>
+                <Label>팀명</Label>
+                <Input value={teamName} readOnly/>
+              </div>
+              <div>
+                <Label>제출일</Label>
+                <Input value={taskDate ? formatDate(taskDate) : "제출 전"} readOnly />
+              </div>
+              <div>
+                <Label>제출 기한</Label>
+                <Input
+                    value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
+                    readOnly
+                />
+              </div>
+            </Row>
 
-        <Section>
-          <SectionTitle>과제 내용</SectionTitle>
-          {tasks.map((task, idx) => (
-            <TaskCard key={idx}>
-              <Label>과제 {idx + 1} 제목</Label>
-              <Input placeholder="과제 제목" value={task.title} readOnly />
-              <Label>상세 항목</Label>
-              <Input placeholder="상세 항목" value={task.detail} readOnly />
-            </TaskCard>
-          ))}
-        </Section>
-      </Content>
-    </Container>
+          </Section>
+
+          <Section>
+            <SectionTitle>세부 과제 및 답변</SectionTitle>
+            {tasks.map((task, idx) => (
+                <TaskCard key={idx}>
+                  <Label>과제 {idx + 1} 제목</Label>
+                  <Input value={task.title} readOnly />
+                  <Label>과제 설명</Label>
+                  <Input value={task.detail} readOnly />
+                  <Label>과제 답변</Label>
+                  <Input
+                      value={task.content} readOnly />
+                </TaskCard>
+            ))}
+          </Section>
+        </Content>
+      </Container>
   );
 }

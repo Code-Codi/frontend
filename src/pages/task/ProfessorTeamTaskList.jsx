@@ -144,12 +144,17 @@ const OptionItem = styled.li`
   }
 `;
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return "제출전";
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+};
+
 export default function ProfessorTeamTaskList() {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
   const [open, setOpen] = useState(false);
 
   // 팀 목록 (실제 API 연동 시 바꿔주세요)
@@ -168,13 +173,20 @@ export default function ProfessorTeamTaskList() {
 
   const fetchTasks = async (pageNum = 0, teamIdParam = selectedTeamId) => {
     try {
-      if (!teamIdParam) return;
-      const res = await axios.get(
-        `http://localhost:8080/tasks?teamId=${teamIdParam}&page=${pageNum}&size=10`
-      );
-      setTasks(res.data.content);
-      setPage(res.data.number);
-      setTotalPages(res.data.totalPages);
+      const res = await axios.get(`http://localhost:8080/tasks/teamTasks`, {
+        params: {
+          page: pageNum,
+          size: 10,
+          courseId: 1,
+          teamId: 164,
+          status: "COMPLETE",
+        },
+      });
+
+      const result = res.data.result;
+      setTasks(result.content || []);
+      setPage(result.number);
+      setTotalPages(result.totalPages);
     } catch (error) {
       console.error("과제 리스트 조회 실패:", error);
     }
@@ -250,9 +262,9 @@ export default function ProfessorTeamTaskList() {
             </thead>
             <tbody>
               {tasks.map((task, idx) => (
-                <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
+                <TableRow key={task.taskId} onClick={() => goToDetail(task.taskId)}>
                   <Td>{page * 10 + idx + 1}</Td>
-                  <Td>{task.taskDate}</Td>
+                  <Td>{formatDate(task.taskDate)}</Td>
                   <Td>{task.title}</Td>
                   <Td>
                     <SubmitButton submitted={task.status === "COMPLETE"}>
