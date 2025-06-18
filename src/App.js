@@ -37,6 +37,7 @@ import GuideWrite from "./pages/guide/GuideWrite";
 // 로그인
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Login/Signup";
+import Delete  from "./pages/Login/Delete";
 
 import LayoutWithoutSidebar from "./LayoutWithoutSidebar";
 
@@ -60,7 +61,7 @@ function LayoutWithSidebar({ children }) {
 
 function AppRoutes() {
   const location = useLocation();
-  const hideSidebarPaths = ["/teamProject", "/login", "/signup"];
+  const hideSidebarPaths = ["/teamProject", "/login", "/signup", "/delete"];
   const isSidebarHidden = hideSidebarPaths.includes(location.pathname);
 
   return (
@@ -71,6 +72,7 @@ function AppRoutes() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/delete" element={<Delete />} />
             <Route path="/teamProject" element={<TeamProject />} />
             <Route path="/" element={<Navigate to="/teamProject" />} />
           </Routes>

@@ -56,8 +56,13 @@ const CancelButton = styled(Button)`
   color: #343c6a;
 `;
 
-const DeleteButton = styled(Button)`
+const LogoutButton = styled(Button)`
   background: #1814f3;
+  color: white;
+`;
+
+const DeleteButton = styled(Button)`
+  background: #5CAFEE;
   color: white;
 `;
 
@@ -79,13 +84,19 @@ export const LogoutModal = ({ onClose }) => {
     }
   };
 
+  const handleDelete = () => {
+    onClose();
+    navigate("/delete");
+  };
+
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <Title>로그아웃하시겠습니까?</Title>
+        <Title>로그아웃/탈퇴 하시겠습니까?</Title>
         <ButtonContainer>
           <CancelButton onClick={onClose}>취소</CancelButton>
-          <DeleteButton onClick={handleLogout}>로그아웃</DeleteButton>
+          <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
+          <DeleteButton onClick={handleDelete}>계정탈퇴</DeleteButton>
         </ButtonContainer>
       </ModalContainer>
     </Overlay>

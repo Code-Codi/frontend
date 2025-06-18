@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); 
 
   const navigate = useNavigate();
 
@@ -36,9 +37,12 @@ const Login = () => {
         } else if (response.result.role == "PROFESSOR") {
           navigate("/taskList"); // 임시 설정
         }
+      } else {
+        setErrorMessage(response.message || "로그인에 실패했습니다.");
       }
     } catch (err) {
       console.error("로그인 요청 에러:", err);
+      setErrorMessage("로그인에 실패했습니다.");
     }
   };
 
@@ -65,6 +69,13 @@ const Login = () => {
           onChange={(e) => setPw(e.target.value)}
           placeholder="비밀번호를 입력하세요"
         />
+
+        {/* 에러 */}
+        {errorMessage && (
+          <p style={{ color: "red", textAlign: "center", marginTop: "10px" }}>
+            {errorMessage}
+          </p>
+        )}
 
         <SubmitButton onClick={handleLogin}>로그인</SubmitButton>
 
