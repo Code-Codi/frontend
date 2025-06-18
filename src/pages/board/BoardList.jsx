@@ -12,10 +12,10 @@ export default function BoardList({ boardType }) {
   const [totalPages, setTotalPages] = useState(1);
 
   const { pathname } = useLocation();
-  const role = localStorage.getItem('role'); // 'USER' or 'PROFESSOR'
+  // const role = localStorage.getItem('role'); // 'USER' or 'PROFESSOR'
   const isGuide = boardType === 'GUIDE';
 
-  const canWrite = isGuide ? role === 'PROFESSOR' : true;
+  // const canWrite = isGuide ? role === 'PROFESSOR' : true;
 
   useEffect(() => {
   getPosts(boardType.toUpperCase(), page - 1).then((res) => {
@@ -192,7 +192,7 @@ useEffect(() => {
       </div>
 
       {/* 글쓰기 버튼 */}
-      {canWrite && (
+      {/* {canWrite && ( */}
         <div>
           <Link
             to={`${pathname}/write`}
@@ -208,7 +208,7 @@ useEffect(() => {
             글쓰기
           </Link>
         </div>
-      )}
+      {/* )} */}
     </section>
   );
 }

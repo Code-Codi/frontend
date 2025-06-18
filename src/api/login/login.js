@@ -26,3 +26,10 @@ export const getCurrentUser = async () => {
   return res.data;
 };
 
+//계정 탈퇴
+export const deleteAccount = async (data) => {
+  const response = await axios.delete(`${BASE_URL}/delete`, {
+    data: data,
+  });
+  return response.data;
+};
