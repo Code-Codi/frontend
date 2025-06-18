@@ -191,26 +191,25 @@ export default function ProfessorTaskDetail() {
   const handleUpdate = async () => {
     try {
       // 1. Task 자체 수정
-      await axios.patch(`http://localhost:8080/tasks/${taskGuideId}`, {
+      await axios.patch(`http://localhost:8080/taskGuide/${taskGuideId}`, {
         title: title,
-        status: "IN_PROGRESS",
-        taskDate: new Date().toISOString().slice(0, 10),
+        dueDate: endDate,
       });
 
       // 2. TaskDetail 각각 수정
-      for (const task of tasks) {
-        if (task.id) {
+      for (const taskGuide of tasks) {
+        if (taskGuide.id) {
           // 기존 항목 → 수정
-          await axios.patch(`http://localhost:8080/task-details/${task.id}`, {
-            title: task.title,
-            content: task.detail,
+          await axios.patch(`http://localhost:8080/taskGuide-details/${taskGuide.id}`, {
+            title: taskGuide.title,
+            description: taskGuide.detail,
           });
         } else {
           // 새 항목 → 생성
-          await axios.post("http://localhost:8080/task-details", {
+          await axios.post("http://localhost:8080/taskGuide-details", {
             taskGuideId: taskGuideId,
-            title: task.title,
-            content: task.detail,
+            title: taskGuide.title,
+            description: taskGuide.detail,
           });
         }
       }
