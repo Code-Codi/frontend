@@ -90,7 +90,7 @@ function AppRoutes() {
             {/* 교수가 생성한 과제 리스트 */}
             <Route path="/professor/taskList" element={<ProfessorTaskList />} />
             <Route
-              path="/professor/taskDetail/:taskId"
+              path="/professor/taskDetail/:taskGuideId"
               element={<ProfessorTaskDetail />}
             />
 
@@ -101,7 +101,7 @@ function AppRoutes() {
             />
             {/* 교수가 팀에 대한 과제 리스트 - 상세 */}
             <Route
-              path="/professor/team/taskDetail/:taskId"
+              path="/professor/team/taskDetail/:taskGuideId"
               element={<ProfessorTeamTaskDetail />}
             />
             <Route

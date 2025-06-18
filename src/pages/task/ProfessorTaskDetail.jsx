@@ -115,7 +115,7 @@ const DeleteIcon = styled.div`
 `;
 
 export default function ProfessorTaskDetail() {
-  const { taskId } = useParams();
+  const {taskGuideId } = useParams();
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([{ title: "", detail: "" }]);
   const [editing, setEditing] = useState(false);
@@ -123,31 +123,34 @@ export default function ProfessorTaskDetail() {
   const isCreateMode = location.pathname === "/professor/taskCreate";
   const navigate = useNavigate();
   const [endDate, setEndDate] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
 
   useEffect(() => {
-    if (!taskId && isCreateMode) {
+    if (!taskGuideId && isCreateMode) {
       setEditing(true);
     }
-    if (taskId && location.pathname.startsWith("/taskDetail")) {
+    if (taskGuideId && location.pathname.startsWith("/taskDetail")) {
       setEditing(false);
     }
-  }, [taskId, location.pathname]);
+  }, [taskGuideId, location.pathname]);
 
   useEffect(() => {
-    if (taskId) {
+    if (taskGuideId) {
       const fetchTask = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8080/tasks/${taskId}`
+            `http://localhost:8080/taskGuide/${taskGuideId}`
           );
           const data = response.data;
 
           setTitle(data.title);
+          setEndDate(data.dueDate?.slice(0, 16));
+          setCreatedAt(data.createAt);
           setTasks(
             data.details.map((detail) => ({
               id: detail.id,
               title: detail.title,
-              detail: detail.content,
+              detail: detail.description,
             }))
           );
         } catch (error) {
@@ -156,30 +159,30 @@ export default function ProfessorTaskDetail() {
       };
       fetchTask();
     }
-  }, [taskId]);
+  }, [taskGuideId]);
 
   const handleCreate = async () => {
     try {
       // 1. Task 생성
-      const taskResponse = await axios.post("http://localhost:8080/tasks", {
+      const taskResponse = await axios.post("http://localhost:8080/taskGuide", {
         //teamId: parseInt(teamId),
         title: title,
         status: "IN_PROGRESS",
         taskDate: new Date().toISOString().slice(0, 10), // yyyy-MM-dd 형식
       });
 
-      const taskId = taskResponse.data;
+      const taskGuideId = taskResponse.data;
 
       // 2. 각 TaskDetail 등록
       for (const task of tasks) {
         await axios.post("http://localhost:8080/task-details", {
-          taskId: taskId,
+          taskGuideId: taskGuideId,
           title: task.title,
           content: task.detail,
         });
       }
       alert("과제가 성공적으로 등록되었습니다!");
-      navigate(`/taskDetail/${taskId}`);
+      navigate(`/taskDetail/${taskGuideId}`);
     } catch (error) {
       console.error("등록 중 오류:", error);
       alert("과제 등록에 실패했습니다.");
@@ -189,7 +192,7 @@ export default function ProfessorTaskDetail() {
   const handleUpdate = async () => {
     try {
       // 1. Task 자체 수정
-      await axios.patch(`http://localhost:8080/tasks/${taskId}`, {
+      await axios.patch(`http://localhost:8080/tasks/${taskGuideId}`, {
         title: title,
         status: "IN_PROGRESS",
         taskDate: new Date().toISOString().slice(0, 10),
@@ -206,7 +209,7 @@ export default function ProfessorTaskDetail() {
         } else {
           // 새 항목 → 생성
           await axios.post("http://localhost:8080/task-details", {
-            taskId: taskId,
+            taskGuideId: taskGuideId,
             title: task.title,
             content: task.detail,
           });
@@ -223,9 +226,9 @@ export default function ProfessorTaskDetail() {
 
   const handleDeleteTask = async () => {
     const confirm = window.confirm("정말 이 과제를 삭제하시겠습니까?");
-    if (!confirm || !taskId) return;
+    if (!confirm || !taskGuideId) return;
     try {
-      await axios.delete(`http://localhost:8080/tasks/${taskId}`);
+      await axios.delete(`http://localhost:8080/tasks/${taskGuideId}`);
       alert("과제가 삭제되었습니다.");
       navigate("/taskList"); // 삭제 후 목록으로 이동
     } catch (error) {
