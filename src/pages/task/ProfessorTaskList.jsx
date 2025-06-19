@@ -9,7 +9,7 @@ const Container = styled.div`
 
 const Content = styled.div`
   margin-left: 248px;
-  padding: 100px 80px 0 80px;
+  padding: 110px 80px 0 80px;
   width: 100%;
   background: #f5f7fa;
 `;
@@ -85,7 +85,7 @@ const PlusButton = styled.div`
 `;
 
 const NotifyButton = styled.button`
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 20px;
   font-size: 13px;
   background: ${({ disabled }) => (disabled ? "#ddd" : "#fff")};
@@ -139,11 +139,15 @@ export default function ProfessorTaskList() {
 
   const handleNotify = async (e, taskGuideId) => {
     e.stopPropagation(); // row 클릭 막기
-    const confirmSend = window.confirm("해당 과제를 학생 팀에게 공지하시겠습니까?");
+    const confirmSend = window.confirm(
+      "해당 과제를 학생 팀에게 공지하시겠습니까?"
+    );
     if (!confirmSend) return;
 
     try {
-      await axios.post(`http://localhost:8080/taskGuide/${taskGuideId}/generateTasks`);
+      await axios.post(
+        `http://localhost:8080/taskGuide/${taskGuideId}/generateTasks`
+      );
       alert("과제가 성공적으로 학생들에게 공지되었습니다.");
 
       setNotifiedTaskIds((prev) => [...prev, taskGuideId]); //
@@ -166,14 +170,15 @@ export default function ProfessorTaskList() {
 
         <Table>
           <thead>
-          <tr>
-            <Th>No</Th>
-            <Th>기간</Th>
-            <Th>제목</Th>
-          </tr>
+            <tr>
+              <Th>No</Th>
+              <Th>기간</Th>
+              <Th>제목</Th>
+              <Th></Th>
+            </tr>
           </thead>
           <tbody>
-          {taskGuides.map((task, idx) => (
+            {taskGuides.map((task, idx) => (
               <TableRow key={task.id} onClick={() => goToDetail(task.id)}>
                 <Td>{page * 10 + idx + 1}</Td>
                 <Td>
@@ -182,26 +187,26 @@ export default function ProfessorTaskList() {
                 <Td>{task.title}</Td>
                 <Td>
                   <NotifyButton
-                      disabled={notifiedTaskIds.includes(task.id)}
-                      onClick={(e) => handleNotify(e, task.id)}
+                    disabled={notifiedTaskIds.includes(task.id)}
+                    onClick={(e) => handleNotify(e, task.id)}
                   >
                     {notifiedTaskIds.includes(task.id) ? "공지 완료" : "공지"}
                   </NotifyButton>
                 </Td>
               </TableRow>
-          ))}
+            ))}
           </tbody>
         </Table>
 
         <Pagination>
-          {Array.from({length: totalPages}, (_, i) => (
-              <PageButton
-                  key={i}
-                  active={i === page}
-                  onClick={() => fetchTasks(i)}
-              >
-                {i + 1}
-              </PageButton>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <PageButton
+              key={i}
+              active={i === page}
+              onClick={() => fetchTasks(i)}
+            >
+              {i + 1}
+            </PageButton>
           ))}
         </Pagination>
       </Content>

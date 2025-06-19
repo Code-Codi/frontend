@@ -35,12 +35,13 @@ const TableRow = styled.tr`
 `;
 
 const SubmitButton = styled.button`
-  padding: 6px 14px;
+  padding: 2px 12px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 20px;
   background: ${({ submitted }) => (submitted ? "#fff" : "#fff")};
   color: ${({ submitted }) => (submitted ? "#1814f3" : "#000")};
+  cursor: pointer;
 `;
 
 const Pagination = styled.div`
@@ -103,12 +104,6 @@ export default function TaskTable() {
     fetchTasks(0);
   }, [teamId]);
 
-  const handleSubmit = (task) => {
-    if (window.confirm("과제를 제출하시겠습니까?")) {
-      alert("제출되었습니다 (로직 구현 필요)");
-    }
-  };
-
   const goToDetail = (taskId) => {
     navigate(`/taskDetail/${taskId}`);
   };
@@ -128,11 +123,10 @@ export default function TaskTable() {
     }
   };
 
-
   return (
     <>
       <HeaderRow>
-        <h2 style={{ fontSize: "20px", color: "#343C6A", fontWeight: "bold" }}>
+        <h2 style={{ fontSize: "22px", color: "#343C6A", fontWeight: "bold" }}>
           과제 리스트
         </h2>
       </HeaderRow>
@@ -150,15 +144,17 @@ export default function TaskTable() {
           {tasks.map((task, idx) => (
             <TableRow key={task.taskId} onClick={() => goToDetail(task.taskId)}>
               <Td>{page * 10 + idx + 1}</Td>
-              <Td>{`${formatDate(task.createAt)} ~ ${formatDate(task.dueDate)}`}</Td>
+              <Td>{`${formatDate(task.createAt)} ~ ${formatDate(
+                task.dueDate
+              )}`}</Td>
               <Td>{task.title}</Td>
               <Td>
                 <SubmitButton
-                    submitted={task.status === "COMPLETE"}
-                    onClick={(e) => {
-                      e.stopPropagation(); // 행 클릭 방지
-                      handleToggleStatus(task);
-                    }}
+                  submitted={task.status === "COMPLETE"}
+                  onClick={(e) => {
+                    e.stopPropagation(); // 행 클릭 방지
+                    handleToggleStatus(task);
+                  }}
                 >
                   {task.status === "COMPLETE" ? "제출완료" : "제출전"}
                 </SubmitButton>

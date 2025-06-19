@@ -11,9 +11,10 @@ const Container = styled.div`
 
 const Content = styled.div`
   margin-left: 248px;
-  padding: 100px 80px 0 80px;
+  padding: 110px 80px 0 80px;
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 20px;
 `;
 
 const Section = styled.div`
@@ -42,7 +43,6 @@ const Row = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 16px;
-  font-size: 22px;
   color: #343c6a;
   font-weight: bold;
   margin-top: 10px;
@@ -52,35 +52,26 @@ const TaskCard = styled.div`
   background: white;
   border-radius: 10px;
   padding: 20px;
+  margin-top: 15px;
   margin-bottom: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  width: 100%;
 `;
 
 const Label = styled.div`
   font-weight: 600;
   margin-top: 12px;
+  font-size: 20px;
   color: #343c6a;
 `;
 
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 20px;
-`;
+const DetailLabel = styled.div`
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 15px;
+  color: #343c6a;
 
-const ActionButton = styled.button`
-  background: #1814f3;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background: #0f0cc0;
+  &:first-of-type {
+    margin-top: 0;
   }
 `;
 
@@ -102,13 +93,12 @@ export default function ProfessorTaskDetail() {
   const [dueDate, setDueDate] = useState("");
   const [createdAt, setCreatedAt] = useState("");
 
-
   useEffect(() => {
     if (taskId) {
       const fetchTask = async () => {
         try {
           const response = await axios.get(
-              `http://localhost:8080/tasks/final/${taskId}`
+            `http://localhost:8080/tasks/final/${taskId}`
           );
           const data = response.data.result;
 
@@ -119,12 +109,12 @@ export default function ProfessorTaskDetail() {
           setCreatedAt(data.createAt?.slice(0, 16));
 
           setTasks(
-              data.details.map((d) => ({
-                taskDetailId: d.taskDetailId,
-                title: d.title,
-                detail: d.description,
-                content: d.content,
-              }))
+            data.details.map((d) => ({
+              taskDetailId: d.taskDetailId,
+              title: d.title,
+              detail: d.description,
+              content: d.content,
+            }))
           );
         } catch (error) {
           console.error("과제 정보를 불러오는 데 실패했습니다:", error);
@@ -135,46 +125,47 @@ export default function ProfessorTaskDetail() {
   }, [taskId]);
 
   return (
-      <Container>
-        <Content>
-          <Section>
-            <SectionTitle>과제 조회</SectionTitle>
-            <Input value={title} readOnly />
-            <Row>
-              <div>
-                <Label>팀명</Label>
-                <Input value={teamName} readOnly/>
-              </div>
-              <div>
-                <Label>제출일</Label>
-                <Input value={taskDate ? formatDate(taskDate) : "제출 전"} readOnly />
-              </div>
-              <div>
-                <Label>제출 기한</Label>
-                <Input
-                    value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
-                    readOnly
-                />
-              </div>
-            </Row>
+    <Container>
+      <Content>
+        <Section>
+          <SectionTitle>과제 조회</SectionTitle>
+          <Input value={title} readOnly />
+          <Row>
+            <div>
+              <Label>팀명</Label>
+              <Input value={teamName} readOnly />
+            </div>
+            <div>
+              <Label>제출일</Label>
+              <Input
+                value={taskDate ? formatDate(taskDate) : "제출 전"}
+                readOnly
+              />
+            </div>
+            <div>
+              <Label>제출 기한</Label>
+              <Input
+                value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
+                readOnly
+              />
+            </div>
+          </Row>
+        </Section>
 
-          </Section>
-
-          <Section>
-            <SectionTitle>세부 과제 및 답변</SectionTitle>
-            {tasks.map((task, idx) => (
-                <TaskCard key={idx}>
-                  <Label>과제 {idx + 1} 제목</Label>
-                  <Input value={task.title} readOnly />
-                  <Label>과제 설명</Label>
-                  <Input value={task.detail} readOnly />
-                  <Label>과제 답변</Label>
-                  <Input
-                      value={task.content} readOnly />
-                </TaskCard>
-            ))}
-          </Section>
-        </Content>
-      </Container>
+        <Section>
+          <SectionTitle>세부 과제 및 답변</SectionTitle>
+          {tasks.map((task, idx) => (
+            <TaskCard key={idx}>
+              <DetailLabel>과제 {idx + 1} 제목</DetailLabel>
+              <Input value={task.title} readOnly />
+              <DetailLabel>과제 설명</DetailLabel>
+              <Input value={task.detail} readOnly />
+              <DetailLabel>과제 답변</DetailLabel>
+              <Input value={task.content} readOnly />
+            </TaskCard>
+          ))}
+        </Section>
+      </Content>
+    </Container>
   );
 }

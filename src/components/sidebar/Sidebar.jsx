@@ -114,7 +114,8 @@ const Sidebar = () => {
       if (item.path == "/meetingList") {
         return (
           location.pathname.startsWith("/meetingList") ||
-          location.pathname.startsWith("/meetingDetail")
+          location.pathname.startsWith("/meetingDetail") ||
+          location.pathname.startsWith("/meetingCreate")
         );
       }
       if (item.path == "/taskList") {

@@ -11,7 +11,7 @@ import { getSchedule } from "../../api/schedule/scheduleAPI";
 const ScheduleContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 100px 70px 0 310px;
+  margin: 110px 70px 0 320px;
   background: #f5f7fa;
 `;
 
@@ -25,7 +25,7 @@ const ArrowButton = styled.button`
   background: none;
   border: none;
   color: #343c6a;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
   padding: 20px;
 

@@ -9,7 +9,7 @@ const Container = styled.div`
 
 const Content = styled.div`
   margin-left: 248px;
-  padding: 100px 80px 0 80px;
+  padding: 110px 80px 0 80px;
   width: 100%;
   background: #f5f7fa;
 `;
@@ -46,7 +46,7 @@ const TableRow = styled.tr`
 `;
 
 const SubmitButton = styled.button`
-  padding: 6px 14px;
+  padding: 6px 10px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 20px;
@@ -147,7 +147,10 @@ const OptionItem = styled.li`
 const formatDate = (dateStr) => {
   if (!dateStr) return "제출전";
   const date = new Date(dateStr);
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}.${String(date.getDate()).padStart(2, "0")}`;
 };
 
 export default function ProfessorTeamTaskList() {
@@ -164,15 +167,17 @@ export default function ProfessorTeamTaskList() {
   // 초기값은 기본 첫 번째 팀
   const [selectedTeamId, setSelectedTeamId] = useState(null);
 
-
   useEffect(() => {
     const fetchTeamOptions = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/teamProject/teams/course", {
-          params: { courseId: localStorage.getItem("courseId") },
-        });
+        const res = await axios.get(
+          "http://localhost:8080/teamProject/teams/course",
+          {
+            params: { courseId: localStorage.getItem("courseId") },
+          }
+        );
 
-        const fetchedTeams = res.data.result.map(team => ({
+        const fetchedTeams = res.data.result.map((team) => ({
           id: team.teamid,
           name: team.name,
         }));
@@ -194,8 +199,6 @@ export default function ProfessorTeamTaskList() {
   }, []);
 
   const selectedTeam = teamOptions.find((team) => team.id === selectedTeamId);
-
-
 
   const fetchTasks = async (pageNum = 0, teamIdParam = selectedTeamId) => {
     try {
@@ -292,7 +295,10 @@ export default function ProfessorTeamTaskList() {
             </thead>
             <tbody>
               {tasks.map((task, idx) => (
-                <TableRow key={task.taskId} onClick={() => goToDetail(task.taskId)}>
+                <TableRow
+                  key={task.taskId}
+                  onClick={() => goToDetail(task.taskId)}
+                >
                   <Td>{page * 10 + idx + 1}</Td>
                   <Td>{formatDate(task.taskDate)}</Td>
                   <Td>{task.title}</Td>
