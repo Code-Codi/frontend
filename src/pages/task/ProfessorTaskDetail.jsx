@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
@@ -37,6 +37,25 @@ const Input = styled.input`
   margin-top: 8px;
   box-sizing: border-box;
   height: 46px;
+`;
+
+const StyledTextarea = styled.textarea`
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin-top: 8px;
+  box-sizing: border-box;
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+
+  &:disabled {
+    background: #f5f5f5;
+    color: #888;
+  }
 `;
 
 const Row = styled.div`
@@ -328,7 +347,7 @@ export default function ProfessorTaskDetail() {
                 disabled={!editing}
               />
               <DetailLabel>상세 항목</DetailLabel>
-              <Input
+              <StyledTextarea
                 placeholder="상세 항목 입력"
                 value={task.detail}
                 onChange={(e) =>
