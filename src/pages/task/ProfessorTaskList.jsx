@@ -110,7 +110,6 @@ export default function ProfessorTaskList() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
   const courseId = localStorage.getItem("courseId");
-  const [notifiedTaskIds, setNotifiedTaskIds] = useState([]);
 
   const goToDetail = (taskGuideId) => {
     navigate(`/professor/taskDetail/${taskGuideId}`);
@@ -134,7 +133,7 @@ export default function ProfessorTaskList() {
   }, []);
 
   const handleCreateTask = () => {
-    navigate(`/professor/taskCreate`); //임시설정
+    navigate(`/professor/taskCreate`);
   };
 
   const handleNotify = async (e, taskGuideId) => {
@@ -149,8 +148,7 @@ export default function ProfessorTaskList() {
         `http://localhost:8080/taskGuide/${taskGuideId}/generateTasks`
       );
       alert("과제가 성공적으로 학생들에게 공지되었습니다.");
-
-      setNotifiedTaskIds((prev) => [...prev, taskGuideId]); //
+      fetchTasks(page);
     } catch (error) {
       console.error("과제 공지 실패:", error);
       alert("공지 중 오류가 발생했습니다.");
@@ -187,10 +185,10 @@ export default function ProfessorTaskList() {
                 <Td>{task.title}</Td>
                 <Td>
                   <NotifyButton
-                    disabled={notifiedTaskIds.includes(task.id)}
+                      disabled={task.status === "COMPLETED"}
                     onClick={(e) => handleNotify(e, task.id)}
                   >
-                    {notifiedTaskIds.includes(task.id) ? "공지 완료" : "공지"}
+                    {task.status === "COMPLETED" ? "공지 완료" : "공지"}
                   </NotifyButton>
                 </Td>
               </TableRow>
