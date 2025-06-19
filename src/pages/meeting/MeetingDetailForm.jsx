@@ -240,6 +240,11 @@ export default function MeetingDetailForm() {
         location: locationName,
       });
 
+      await axios.patch(`http://localhost:8080/meeting/item/attendees`, {
+        meetingId: parseInt(meetingId),
+        attendeeIds: participants,
+      });
+
       // 삭제된 AgendaDetail 먼저 삭제
       for (const id of deletedAgendaDetailIds) {
         await axios.delete(
