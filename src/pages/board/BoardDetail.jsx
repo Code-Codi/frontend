@@ -104,9 +104,17 @@ export default function BoardDetail({ boardType }) {
     getComments(postId).then((res) => setComments(res.data.result));
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [boardType, postId]);
+useEffect(() => {
+  getPost(boardType.toLowerCase(), postId).then((res) => {
+    setPost(res.data.result);
+  });
+
+  // 조회수 증가
+  fetch(`http://localhost:8080/post/${postId}/view`, {
+    method: "POST",
+  });
+}, [boardType, postId]);
+
 
   const handleSubmit = async () => {
     if (!newComment.trim()) return;
