@@ -254,7 +254,7 @@ export default function ProfessorTeamTaskList() {
         <>
           <HeaderRow>
             <h2
-              style={{ fontSize: "20px", color: "#343C6A", fontWeight: "bold" }}
+              style={{ fontSize: "22px", color: "#343C6A", fontWeight: "bold" }}
             >
               과제 리스트
             </h2>
