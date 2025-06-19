@@ -368,6 +368,13 @@ export default function MeetingDetailForm() {
           content: d.content,
         }));
         setDecisions(processedDecisions);
+
+        const attendeeRes = await axios.get(
+            `http://localhost:8080/meeting/item/${meetingId}/attendees`
+        );
+        const attendeeIds = attendeeRes.data.result.map((a) => a.userTeamId);
+        setParticipants(attendeeIds); // set state
+
       } catch (err) {
         console.error("회의 조회 실패:", err);
       }
