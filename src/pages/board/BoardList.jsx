@@ -148,74 +148,58 @@ export default function BoardList({ boardType }) {
 
       {/* 페이지네이션 */}
       <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "8px",
-          marginTop: "16px",
-        }}
-      >
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      marginTop: "16px",
+    }}
+  >
+    {[...Array(totalPages)].map((_, idx) => {
+      const num = idx + 1;
+      const isActive = num === page;
+      return (
         <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          style={{
-            background: "none",
-            border: "none",
-            color: page === 1 ? "#ccc" : "#1814F3",
-            cursor: page === 1 ? "default" : "pointer",
-          }}
-        >
-          Previous
-        </button>
-        {[...Array(totalPages)].map((_, idx) => {
-          const num = idx + 1;
-          return (
-            <button
-              key={num}
-              onClick={() => setPage(num)}
-              style={{
-                width: "32px",
-                height: "32px",
-                borderRadius: "8px",
-                border: "none",
-                background: num === page ? "#1814F3" : "#fff",
-                color: num === page ? "#fff" : "#1814F3",
-                cursor: "pointer",
-              }}
-            >
-              {num}
-            </button>
-          );
-        })}
-        <button
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page === totalPages}
-          style={{
-            background: "none",
-            border: "none",
-            color: page === totalPages ? "#ccc" : "#1814F3",
-            cursor: page === totalPages ? "default" : "pointer",
-          }}
-        >
-          Next
-        </button>
-      </div>
+            key={num}
+            onClick={() => setPage(num)}
+            style={{
+              background: isActive ? "#1814f3" : "#fff",
+              color: isActive ? "#fff" : "#000",
+              border: "1px solid #ccc",
+              padding: "8px 14px",
+              margin: "0 4px",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            {num}
+          </button>
+        );
+      })}
+    </div>
+
 
       {/* 글쓰기 버튼 */}
       {/* {canWrite && ( */}
-      <div>
+      <div
+      style={{
+    display: "flex",
+    justifyContent: "flex-end", 
+    marginTop: "16px",
+  }}
+      >
         <Link
           to={`${pathname}/write`}
           style={{
             padding: "8px 16px",
             backgroundColor: "#1814F3",
             color: "white",
-            fontSize: "14px",
+            fontSize: "20px",
             borderRadius: "8px",
             textDecoration: "none",
+            fontWeight: "bold",
           }}
         >
-          글쓰기
+          +
         </Link>
       </div>
       {/* )} */}
