@@ -137,7 +137,11 @@ export default function MeetingTable() {
                 <Td>{page * 10 + idx + 1}</Td>
                 <Td>{item.dateTime?.split("T")[0]}</Td>
                 <Td>{item.title}</Td>
-                <Td>-</Td>
+                <Td>
+                  {item.attendees && item.attendees.length > 0
+                      ? item.attendees.join(", ")
+                      : "-"}
+                </Td>
                 <Td>{item.location}</Td>
               </TableRow>
             );

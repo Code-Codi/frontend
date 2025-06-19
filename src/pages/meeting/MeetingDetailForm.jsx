@@ -145,13 +145,26 @@ export default function MeetingDetailForm() {
   const [deletedAgendaDetailIds, setDeletedAgendaDetailIds] = useState([]);
   const [deletedDecisionIds, setDeletedDecisionIds] = useState([]);
 
-  const participantOptions = ["ALL", "세미", "수현", "민경", "세령"];
+  const [userTeamOptions, setUserTeamOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchUserTeamMembers = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/teamProject/${teamId}/userTeam`);
+        setUserTeamOptions(res.data.result); // [{userTeamId: 242, name: "세미"}, ...]
+      } catch (error) {
+        console.error("팀원 정보 조회 실패:", error);
+      }
+    };
+    if (teamId) fetchUserTeamMembers();
+  }, [teamId]);
+
   const handleCreate = async () => {
-    console.log("➡️ [handleCreate] 호출됨");
-    console.log("📌 teamId:", teamId);
-    console.log("📌 title:", title);
-    console.log("📌 date:", date);
-    console.log("📌 locationName:", locationName);
+    console.log(" [handleCreate] 호출됨");
+    console.log("teamId:", teamId);
+    console.log(" title:", title);
+    console.log(" date:", date);
+    console.log(" locationName:", locationName);
 
     try {
       if (!teamId) {
@@ -203,6 +216,13 @@ export default function MeetingDetailForm() {
         });
       }
 
+      if (participants.length > 0) {
+        await axios.post("http://localhost:8080/meeting/item/attendees", {
+          meetingId,
+          attendeeIds: participants,
+        });
+      }
+
       alert("회의록이 성공적으로 등록되었습니다!");
       navigate(`/meetingDetail/${meetingId}`);
     } catch (error) {
@@ -218,6 +238,11 @@ export default function MeetingDetailForm() {
         title,
         dateTime: formattedDateTime,
         location: locationName,
+      });
+
+      await axios.patch(`http://localhost:8080/meeting/item/attendees`, {
+        meetingId: parseInt(meetingId),
+        attendeeIds: participants,
       });
 
       // 삭제된 AgendaDetail 먼저 삭제
@@ -348,6 +373,13 @@ export default function MeetingDetailForm() {
           content: d.content,
         }));
         setDecisions(processedDecisions);
+
+        const attendeeRes = await axios.get(
+            `http://localhost:8080/meeting/item/${meetingId}/attendees`
+        );
+        const attendeeIds = attendeeRes.data.result.map((a) => a.userTeamId);
+        setParticipants(attendeeIds); // set state
+
       } catch (err) {
         console.error("회의 조회 실패:", err);
       }
@@ -362,26 +394,18 @@ export default function MeetingDetailForm() {
     }
   }, [isCreateMode, meetingId]);
 
-  const handleToggleSelect = (value) => {
-    if (value === "ALL") {
-      setParticipants(["ALL"]);
-    } else {
-      setParticipants((prev) => {
-        const exists = prev.includes(value);
-        const filtered = prev.filter((p) => p !== "ALL");
-        return exists
-          ? filtered.filter((p) => p !== value)
-          : [...filtered, value];
-      });
-    }
+  const handleToggleSelect = (id) => {
+    setParticipants((prev) =>
+        prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+    );
   };
 
   const renderParticipantDisplay = () => {
-    return participants.length === 0
-      ? "참가자 선택"
-      : participants.includes("ALL")
-      ? "ALL"
-      : participants.join(", ");
+    if (participants.length === 0) return "참가자 선택";
+    const selectedNames = userTeamOptions
+        .filter(opt => participants.includes(opt.userTeamId))
+        .map(opt => opt.name);
+    return selectedNames.join(", ");
   };
 
   useEffect(() => {
@@ -415,21 +439,25 @@ export default function MeetingDetailForm() {
               />
             </div>
             <div style={{ position: "relative" }} ref={dropdownRef}>
-              <DisplayBox onClick={() => setShowDropdown(!showDropdown)}>
+              <DisplayBox
+                  onClick={() => {
+                    if (editing) setShowDropdown(!showDropdown);
+                  }}
+              >
                 {renderParticipantDisplay()}
               </DisplayBox>
-              {showDropdown && (
-                <Dropdown>
-                  {participantOptions.map((name) => (
-                    <Option
-                      key={name}
-                      selected={participants.includes(name)}
-                      onClick={() => handleToggleSelect(name)}
-                    >
-                      {name}
-                    </Option>
-                  ))}
-                </Dropdown>
+              {showDropdown && editing && (
+                  <Dropdown>
+                    {userTeamOptions.map((user) => (
+                        <Option
+                            key={user.userTeamId}
+                            selected={participants.includes(user.userTeamId)}
+                            onClick={() => handleToggleSelect(user.userTeamId)}
+                        >
+                          {user.name}
+                        </Option>
+                    ))}
+                  </Dropdown>
               )}
             </div>
             <div>
