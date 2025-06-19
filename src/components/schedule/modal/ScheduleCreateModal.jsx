@@ -266,7 +266,7 @@ const ScheduleCreateModal = ({
   return (
     <Overlay onClick={(e) => e.target === e.currentTarget && onClose()}>
       <ModalContainer>
-        <Title>일정 등록</Title>
+        <Title>{mode === "edit" ? "일정 수정" : "일정 등록"}</Title>
 
         <FieldContainer>
           <Label>
@@ -326,7 +326,9 @@ const ScheduleCreateModal = ({
         </MemoContainer>
 
         <SubmitContainer>
-          <SubmitButton onClick={handleSubmit}>등록</SubmitButton>
+          <SubmitButton onClick={handleSubmit}>
+            {mode === "edit" ? "수정" : "등록"}
+          </SubmitButton>
         </SubmitContainer>
       </ModalContainer>
     </Overlay>
