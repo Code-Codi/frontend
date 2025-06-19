@@ -11,7 +11,7 @@ const Container = styled.div`
 
 const Content = styled.div`
   margin-left: 248px;
-  padding: 100px 80px 0 80px;
+  padding: 110px 80px 0 80px;
   width: 100%;
   box-sizing: border-box;
 `;
@@ -45,22 +45,34 @@ const Row = styled.div`
   font-size: 22px;
   color: #343c6a;
   font-weight: bold;
-  margin-top: 10px;
+  margin-top: 15px;
 `;
 
 const TaskCard = styled.div`
   background: white;
   border-radius: 10px;
   padding: 20px;
+  margin-top: 15px;
   margin-bottom: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  width: 100%;
 `;
 
 const Label = styled.div`
   font-weight: 600;
+  font-size: 20px;
   margin-top: 12px;
   color: #343c6a;
+`;
+
+const DetailLabel = styled.div`
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 15px;
+  color: #343c6a;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
 `;
 
 const ButtonGroup = styled.div`
@@ -108,7 +120,7 @@ export default function ProfessorTaskDetail() {
       const fetchTask = async () => {
         try {
           const response = await axios.get(
-              `http://localhost:8080/tasks/final/${taskId}`
+            `http://localhost:8080/tasks/final/${taskId}`
           );
           const data = response.data.result;
 
@@ -119,12 +131,12 @@ export default function ProfessorTaskDetail() {
           setCreatedAt(data.createAt?.slice(0, 16));
 
           setTasks(
-              data.details.map((d) => ({
-                taskDetailId: d.taskDetailId,
-                title: d.title,
-                detail: d.description,
-                content: d.content,
-              }))
+            data.details.map((d) => ({
+              taskDetailId: d.taskDetailId,
+              title: d.title,
+              detail: d.description,
+              content: d.content,
+            }))
           );
         } catch (error) {
           console.error("과제 정보를 불러오는 데 실패했습니다:", error);
@@ -133,7 +145,6 @@ export default function ProfessorTaskDetail() {
       fetchTask();
     }
   }, [taskId]);
-
 
   const handleContentChange = (idx, value) => {
     const updated = [...tasks];
@@ -166,57 +177,59 @@ export default function ProfessorTaskDetail() {
   };
 
   return (
-      <Container>
-        <Content>
-          <Section>
-            <SectionTitle>과제 조회</SectionTitle>
-            <Input value={title} readOnly />
-            <Row>
-              <div>
-                <Label>팀명</Label>
-                <Input value={teamName} readOnly/>
-              </div>
-              <div>
-                <Label>제출일</Label>
-                <Input value={taskDate ? formatDate(taskDate) : "제출 전"} readOnly />
-              </div>
-              <div>
-                <Label>제출 기한</Label>
-                <Input
-                    value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
-                    readOnly
-                />
-              </div>
-            </Row>
+    <Container>
+      <Content>
+        <Section>
+          <SectionTitle>과제 조회</SectionTitle>
+          <Input value={title} readOnly />
+          <Row>
+            <div>
+              <Label>팀명</Label>
+              <Input value={teamName} readOnly />
+            </div>
+            <div>
+              <Label>제출일</Label>
+              <Input
+                value={taskDate ? formatDate(taskDate) : "제출 전"}
+                readOnly
+              />
+            </div>
+            <div>
+              <Label>제출 기한</Label>
+              <Input
+                value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
+                readOnly
+              />
+            </div>
+          </Row>
+        </Section>
 
-          </Section>
+        <Section>
+          <Label>세부 과제 및 답변</Label>
+          {tasks.map((task, idx) => (
+            <TaskCard key={idx}>
+              <DetailLabel>과제 {idx + 1} 제목</DetailLabel>
+              <Input value={task.title} readOnly />
+              <DetailLabel>과제 설명</DetailLabel>
+              <Input value={task.detail} readOnly />
+              <DetailLabel>과제 답변</DetailLabel>
+              <Input
+                value={task.content}
+                onChange={(e) => handleContentChange(idx, e.target.value)}
+                readOnly={!editing}
+              />
+            </TaskCard>
+          ))}
+        </Section>
 
-          <Section>
-            <SectionTitle>세부 과제 및 답변</SectionTitle>
-            {tasks.map((task, idx) => (
-                <TaskCard key={idx}>
-                  <Label>과제 {idx + 1} 제목</Label>
-                  <Input value={task.title} readOnly />
-                  <Label>과제 설명</Label>
-                  <Input value={task.detail} readOnly />
-                  <Label>과제 답변</Label>
-                  <Input
-                      value={task.content}
-                      onChange={(e) => handleContentChange(idx, e.target.value)}
-                      readOnly={!editing}
-                  />
-                </TaskCard>
-            ))}
-          </Section>
-
-          <ButtonGroup>
-            {!editing ? (
-                <ActionButton onClick={handleEditToggle}>작성 및 수정</ActionButton>
-            ) : (
-                <ActionButton onClick={handleSave}>저장</ActionButton>
-            )}
-          </ButtonGroup>
-        </Content>
-      </Container>
+        <ButtonGroup>
+          {!editing ? (
+            <ActionButton onClick={handleEditToggle}>작성 및 수정</ActionButton>
+          ) : (
+            <ActionButton onClick={handleSave}>저장</ActionButton>
+          )}
+        </ButtonGroup>
+      </Content>
+    </Container>
   );
 }

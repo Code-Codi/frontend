@@ -7,7 +7,7 @@ const Container = styled.div`
 
 const Content = styled.div`
   margin-left: 248px;
-  padding: 100px 80px 0 80px;
+  padding: 110px 80px 0 80px;
   width: 100%;
   background: #f5f7fa;
 `;
