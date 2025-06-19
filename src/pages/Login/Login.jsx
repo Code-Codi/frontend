@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -35,7 +35,8 @@ const Login = () => {
         if (response.result.role == "STUDENT") {
           navigate("/teamProject");
         } else if (response.result.role == "PROFESSOR") {
-          navigate("/professor/taskList"); // 임시 설정
+          navigate("/professor/taskList");
+          localStorage.setItem("courseId", 1); //default courseId 설정
         }
       } else {
         setErrorMessage(response.message || "로그인에 실패했습니다.");
