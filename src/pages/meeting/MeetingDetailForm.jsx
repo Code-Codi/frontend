@@ -145,7 +145,6 @@ export default function MeetingDetailForm() {
   const [deletedAgendaDetailIds, setDeletedAgendaDetailIds] = useState([]);
   const [deletedDecisionIds, setDeletedDecisionIds] = useState([]);
 
-  const participantOptions = ["ALL", "세미", "수현", "민경", "세령"];
   const [userTeamOptions, setUserTeamOptions] = useState([]);
 
   useEffect(() => {
@@ -214,6 +213,13 @@ export default function MeetingDetailForm() {
         await axios.post("http://localhost:8080/meeting/item/decision", {
           meetingId,
           content: content.content,
+        });
+      }
+
+      if (participants.length > 0) {
+        await axios.post("http://localhost:8080/meeting/item/attendees", {
+          meetingId,
+          attendeeIds: participants,
         });
       }
 
