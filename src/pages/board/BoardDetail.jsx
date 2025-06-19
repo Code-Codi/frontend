@@ -138,7 +138,7 @@ const handleDeletePost = async () => {
   try {
     await deletePost(postId);
     alert('삭제되었습니다.');
-    navigate(-1); 
+    navigate(`/${boardType.toLowerCase()}`);
   } catch (e) {
     alert('삭제에 실패했습니다.');
     console.error(e);
