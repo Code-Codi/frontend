@@ -85,7 +85,7 @@ const PlusButton = styled.div`
 `;
 
 const NotifyButton = styled.button`
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 20px;
   font-size: 13px;
   background: ${({ disabled }) => (disabled ? "#ddd" : "#fff")};
@@ -174,6 +174,7 @@ export default function ProfessorTaskList() {
               <Th>No</Th>
               <Th>기간</Th>
               <Th>제목</Th>
+              <Th></Th>
             </tr>
           </thead>
           <tbody>

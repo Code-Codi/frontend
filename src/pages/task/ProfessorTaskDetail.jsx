@@ -11,9 +11,10 @@ const Container = styled.div`
 
 const Content = styled.div`
   margin-left: 248px;
-  padding: 100px 80px 0 80px;
+  padding: 110px 80px 0 80px;
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 20px;
 `;
 
 const Section = styled.div`
@@ -42,7 +43,6 @@ const Row = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  font-size: 22px;
   color: #343c6a;
   font-weight: bold;
   margin-top: 10px;
@@ -52,15 +52,27 @@ const TaskCard = styled.div`
   background: white;
   border-radius: 10px;
   padding: 20px;
+  margin-top: 15px;
   margin-bottom: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  width: 100%;
 `;
 
 const Label = styled.div`
   font-weight: 600;
   margin-top: 12px;
+  font-size: 20px;
   color: #343c6a;
+`;
+
+const DetailLabel = styled.div`
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 15px;
+  color: #343c6a;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
 `;
 
 const AddButton = styled.button`
@@ -115,7 +127,7 @@ const DeleteIcon = styled.div`
 `;
 
 export default function ProfessorTaskDetail() {
-  const {taskGuideId } = useParams();
+  const { taskGuideId } = useParams();
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([{ title: "", detail: "" }]);
   const [editing, setEditing] = useState(false);
@@ -199,10 +211,13 @@ export default function ProfessorTaskDetail() {
       for (const taskGuide of tasks) {
         if (taskGuide.id) {
           // 기존 항목 → 수정
-          await axios.patch(`http://localhost:8080/taskGuide-details/${taskGuide.id}`, {
-            title: taskGuide.title,
-            description: taskGuide.detail,
-          });
+          await axios.patch(
+            `http://localhost:8080/taskGuide-details/${taskGuide.id}`,
+            {
+              title: taskGuide.title,
+              description: taskGuide.detail,
+            }
+          );
         } else {
           // 새 항목 → 생성
           await axios.post("http://localhost:8080/taskGuide-details", {
@@ -239,7 +254,9 @@ export default function ProfessorTaskDetail() {
     if (!confirm) return;
     try {
       if (detailId) {
-        await axios.delete(`http://localhost:8080/taskGuide-details/${detailId}`);
+        await axios.delete(
+          `http://localhost:8080/taskGuide-details/${detailId}`
+        );
       }
       const updated = [...tasks];
       updated.splice(idx, 1);
@@ -287,7 +304,7 @@ export default function ProfessorTaskDetail() {
         </Section>
 
         <Section>
-          <SectionTitle>과제 내용</SectionTitle>
+          <Label>과제 내용</Label>
           {tasks.map((task, idx) => (
             <TaskCard key={idx}>
               <div
@@ -297,7 +314,7 @@ export default function ProfessorTaskDetail() {
                   alignItems: "center",
                 }}
               >
-                <Label>과제 {idx + 1} 제목</Label>
+                <DetailLabel>과제 {idx + 1} 제목</DetailLabel>
                 {editing && (
                   <DeleteIcon onClick={() => handleDeleteDetail(idx, task.id)}>
                     🗑
@@ -310,7 +327,7 @@ export default function ProfessorTaskDetail() {
                 onChange={(e) => handleTaskChange(idx, "title", e.target.value)}
                 disabled={!editing}
               />
-              <Label>상세 항목</Label>
+              <DetailLabel>상세 항목</DetailLabel>
               <Input
                 placeholder="상세 항목 입력"
                 value={task.detail}

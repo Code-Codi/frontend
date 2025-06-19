@@ -14,6 +14,7 @@ const Content = styled.div`
   padding: 110px 80px 0 80px;
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 20px;
 `;
 
 const Section = styled.div`
