@@ -105,15 +105,14 @@ export default function BoardDetail({ boardType }) {
   };
 
 useEffect(() => {
-  getPost(boardType.toLowerCase(), postId).then((res) => {
-    setPost(res.data.result);
-  });
+  fetchData();  
 
   // 조회수 증가
   fetch(`http://localhost:8080/post/${postId}/view`, {
     method: "POST",
   });
 }, [boardType, postId]);
+
 
 
   const handleSubmit = async () => {
