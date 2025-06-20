@@ -13,15 +13,25 @@ const Section = styled.div`
     width: 100%;
 `;
 
-const Input = styled.input`
+const StyledTextarea = styled.textarea`
     width: 100%;
     padding: 12px 16px;
-    margin-top: 8px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 16px;
+    margin-top: 8px;
     box-sizing: border-box;
+    min-height: 60px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+
+    &:disabled {
+        background: #f5f5f5;
+        color: #888;
+    }
 `;
+
 
 const Row = styled.div`
     display: flex;
@@ -93,7 +103,7 @@ export default function DecisionSection({ decisions, setDecisions, editing, setD
             {decisions.map((item, index) => (
                 <Row key={item.id || index}>
                     <Badge>{index + 1}</Badge>
-                    <Input
+                    <StyledTextarea
                         placeholder="결정 사항 내용을 입력하세요."
                         value={item.content}
                         onChange={(e) => handleChange(index, e.target.value)}

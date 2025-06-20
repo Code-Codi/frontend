@@ -16,7 +16,6 @@ export default function TeamProjectModal({
   const [emailInput, setEmailInput] = useState("");
   const [memberList, setMemberList] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState(null);
   const [openCourse, setOpenCourse] = useState(false);
   const [courses, setCourses] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -27,8 +26,12 @@ export default function TeamProjectModal({
         const res = await axios.get("http://localhost:8080/courses", {
           withCredentials: true,
         });
-        console.log(res.data.result);
         setCourses(res.data.result);
+        if (editData) {
+          setSelectedCourse(
+            res.data.result.find((c) => c.id === editData.courseId)
+          );
+        }
       } catch (err) {
         console.error("강의 리스트 가져오기 실패", err);
       }

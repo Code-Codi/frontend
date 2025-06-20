@@ -39,6 +39,25 @@ const Input = styled.input`
   height: 46px;
 `;
 
+const StyledTextarea = styled.textarea`
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin-top: 8px;
+  box-sizing: border-box;
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+
+  &:disabled {
+    background: #f5f5f5;
+    color: #888;
+  }
+`;
+
 const Row = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -182,24 +201,24 @@ export default function ProfessorTaskDetail() {
       <Content>
         <Section>
           <SectionTitle>과제 조회</SectionTitle>
-          <Input value={title} readOnly />
+          <Input value={title} disabled />
           <Row>
             <div>
               <Label>팀명</Label>
-              <Input value={teamName} readOnly />
+              <Input value={teamName} disabled />
             </div>
             <div>
               <Label>제출일</Label>
               <Input
                 value={taskDate ? formatDate(taskDate) : "제출 전"}
-                readOnly
+                disabled
               />
             </div>
             <div>
               <Label>제출 기한</Label>
               <Input
                 value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
-                readOnly
+                disabled
               />
             </div>
           </Row>
@@ -210,14 +229,14 @@ export default function ProfessorTaskDetail() {
           {tasks.map((task, idx) => (
             <TaskCard key={idx}>
               <DetailLabel>과제 {idx + 1} 제목</DetailLabel>
-              <Input value={task.title} readOnly />
+              <Input value={task.title} disabled />
               <DetailLabel>과제 설명</DetailLabel>
-              <Input value={task.detail} readOnly />
-              <DetailLabel>과제 답변</DetailLabel>
-              <Input
+              <Input value={task.detail} disabled />
+              <disabled>과제 답변</disabled>
+              <StyledTextarea
                 value={task.content}
                 onChange={(e) => handleContentChange(idx, e.target.value)}
-                readOnly={!editing}
+                disabled={!editing}
               />
             </TaskCard>
           ))}

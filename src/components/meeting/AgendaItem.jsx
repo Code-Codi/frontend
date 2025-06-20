@@ -20,6 +20,25 @@ const Input = styled.input`
     box-sizing: border-box;
 `;
 
+const StyledTextarea = styled.textarea`
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    margin-top: 8px;
+    box-sizing: border-box;
+    min-height: 60px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+
+    &:disabled {
+        background: #f5f5f5;
+        color: #888;
+    }
+`;
+
 const Label = styled.div`
     font-weight: 600;
     margin-top: 12px;
@@ -105,7 +124,7 @@ export default function AgendaItem({ index, agenda, agendas, setAgendas, editing
             <Label>상세 항목</Label>
             {agenda.details.map((detail, dIdx) => (
                 <div style={{ display: 'flex', alignItems: 'center' }} key={detail.id || dIdx}>
-                    <Input
+                    <StyledTextarea
                         placeholder={`상세 항목 ${dIdx + 1}`}
                         value={detail.content}
                         onChange={(e) => handleDetailChange(dIdx, e.target.value)}

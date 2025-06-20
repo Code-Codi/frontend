@@ -105,15 +105,14 @@ export default function BoardDetail({ boardType }) {
   };
 
 useEffect(() => {
-  getPost(boardType.toLowerCase(), postId).then((res) => {
-    setPost(res.data.result);
-  });
+  fetchData();  
 
   // 조회수 증가
   fetch(`http://localhost:8080/post/${postId}/view`, {
     method: "POST",
   });
 }, [boardType, postId]);
+
 
 
   const handleSubmit = async () => {
@@ -139,7 +138,7 @@ const handleDeletePost = async () => {
   try {
     await deletePost(postId);
     alert('삭제되었습니다.');
-    navigate(-1); 
+    navigate(`/${boardType.toLowerCase()}`);
   } catch (e) {
     alert('삭제에 실패했습니다.');
     console.error(e);

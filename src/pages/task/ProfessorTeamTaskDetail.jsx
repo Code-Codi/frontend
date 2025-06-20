@@ -129,24 +129,24 @@ export default function ProfessorTaskDetail() {
       <Content>
         <Section>
           <SectionTitle>과제 조회</SectionTitle>
-          <Input value={title} readOnly />
+          <Input value={title} disabled />
           <Row>
             <div>
               <Label>팀명</Label>
-              <Input value={teamName} readOnly />
+              <Input value={teamName} disabled />
             </div>
             <div>
               <Label>제출일</Label>
               <Input
                 value={taskDate ? formatDate(taskDate) : "제출 전"}
-                readOnly
+                disabled
               />
             </div>
             <div>
               <Label>제출 기한</Label>
               <Input
                 value={`${formatDate(createdAt)} ~ ${formatDate(dueDate)}`}
-                readOnly
+                disabled
               />
             </div>
           </Row>
@@ -157,11 +157,11 @@ export default function ProfessorTaskDetail() {
           {tasks.map((task, idx) => (
             <TaskCard key={idx}>
               <DetailLabel>과제 {idx + 1} 제목</DetailLabel>
-              <Input value={task.title} readOnly />
+              <Input value={task.title} disabled />
               <DetailLabel>과제 설명</DetailLabel>
-              <Input value={task.detail} readOnly />
+              <Input value={task.detail} disabled />
               <DetailLabel>과제 답변</DetailLabel>
-              <Input value={task.content} readOnly />
+              <Input value={task.content} disabled />
             </TaskCard>
           ))}
         </Section>
