@@ -152,7 +152,7 @@ export default function TeamProject() {
               className="card-content"
               onClick={() => {
                 localStorage.setItem("teamId", project.id);
-                navigate(`/project?teamId=${project.id}`);
+                navigate(`/share?teamId=${project.id}`);
               }}
             >
               <p className="project-title">{project.name}</p>

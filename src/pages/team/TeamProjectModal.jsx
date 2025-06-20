@@ -22,17 +22,6 @@ export default function TeamProjectModal({
   const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
-    // const fetchLoginUser = async () => {
-    //   try {
-    //     const res = await axios.get("http://localhost:8080/users/me", {
-    //       withCredentials: true,
-    //     });
-    //     setLoggedInUser(res.data.result);
-    //   } catch (err) {
-    //     console.error("로그인 사용자 정보 가져오기 실패", err);
-    //   }
-    // };
-    // fetchLoginUser();
     const fetchCourses = async () => {
       try {
         const res = await axios.get("http://localhost:8080/courses", {
